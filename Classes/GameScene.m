@@ -34,7 +34,7 @@
 			  @"prp",
 			  @"ylw", nil];
 }
-/*
+
 - (void) drawRect:(CGRect) rect
 {
 	CGPoint vertices[4]={
@@ -57,7 +57,7 @@
 		[self drawRect:hitArea];
 	}
 }
-*/
+
 
 -(NSString*) pickBlockColor
 {
@@ -473,7 +473,7 @@
                                                                position:ccp(0,-1 * [removedBlock getWidth])]];
                     
                         //update postion for each row it falls
-                        [block setGridPosition:([block getGridPosition] - numOfGridCols)];
+                        [block setGridPosition:([block getGridPosition] - (numOfGridCols * [removedBlock getSize]))];
                         
                         [movedBlocks addObject:block];
                         
@@ -490,13 +490,12 @@
             
         }
 	}
-    CCLOG(@"blocks count 2: %i", [blocks count]);
+    
     for(Block* block in movedBlocks)
     {
         [blocks replaceObjectAtIndex:[block getGridPosition] withObject:block];
     }
     
-    CCLOG(@"blocks count 3: %i", [blocks count]);
     for(Block* block in newBlocks)
     {
         for(int i = 0; i < [[touchedBlockColumns objectAtIndex:([block getGridPosition] % numOfGridCols)] intValue]; i++)
@@ -517,15 +516,12 @@
         
         [blocks replaceObjectAtIndex:[block getGridPosition] withObject:block];
     }
-    CCLOG(@"blocks count 4: %i", [blocks count]);
 }
 
 
 - (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event 
 {    
     CCLOG(@"Touch Began");
-	
-	//touchHappening = YES;
 	
 	touchedColor = @"none";
 	blockCount = 0;
@@ -541,10 +537,7 @@
     [self selectSpriteForTouch:touchLocation]; 
 }
 - (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
-{
-	CCLOG(@"Touch Ended blockCount: %i", [touchedBlocks count]);
-	//touchHappening = NO;
-	
+{	
 	if(blockCount == 0)
 	{
 		CCLOG(@"blockCount is 0!!");
@@ -556,12 +549,10 @@
 	{
         for (Block* block in touchedBlocks) 
 		{
-			//[blocks removeObject:block];
-            [block hide];
-			//[block remove];			
+            [block hide];			
 		}
 		[self makeBlocksFall2:[self addNewBlocksAtTop2]];
-        CCLOG(@"Number of blocks after return:%i", [blocks count]);
+        
         for (Block* block in touchedBlocks) 
 		{
 			[block remove];			
@@ -571,7 +562,6 @@
 	
 	else 
 	{
-		//for (Block* block in deadBlocks) 
         for (Block* block in touchedBlocks) 
 		{
 			[block swapToNormalBlock];
@@ -590,6 +580,7 @@
 	blockCount = 0;
     
     CCLOG(@"Number of blocks:%i", [blocks count]);
+    //[self detectBlockFusion];
 }
 
 -(void)loadTestArray

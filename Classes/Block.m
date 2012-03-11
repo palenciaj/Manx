@@ -44,7 +44,7 @@
 {
 	//CCLOG(@"Calc Hit Area");
 	
-	int q = 14;
+	int q = 9;
 	
 	int x = mySprite.position.x + q/2;
 	int y = mySprite.position.y + q/2;
