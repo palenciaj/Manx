@@ -34,7 +34,7 @@
 			  @"prp",
 			  @"ylw", nil];
 }
-
+/*
 - (void) drawRect:(CGRect) rect
 {
 	CGPoint vertices[4]={
@@ -57,7 +57,7 @@
 		[self drawRect:hitArea];
 	}
 }
-
+*/
 
 -(NSString*) pickBlockColor
 {
