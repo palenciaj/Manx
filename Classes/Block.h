@@ -15,6 +15,8 @@
 	NSString* myColor;
 	int mySize;
     int myGridPosition;
+    
+    NSMutableArray* myActions;
 	
 	CCNode* myParent;
 }
@@ -25,8 +27,10 @@
 -(void)swapToDeadBlock;
 -(void)swapToNormalBlock;
 -(void)swapToEmptyBlock;
+-(void)swapToSpacerBlock;
 
--(void)runAction:(NSMutableArray*)actions;
+-(void)addAction:(CCAction*)action;
+-(void)runActions;
 
 -(CGPoint)getPosition;
 -(void)setPosition:(CGPoint)position;

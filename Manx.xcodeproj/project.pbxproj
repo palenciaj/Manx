@@ -10,9 +10,9 @@
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1F3B9A2D0EF2145700286867 /* ManxAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F3B9A2B0EF2145700286867 /* ManxAppDelegate.m */; };
 		374E691E14FB507D00834CBE /* dead2_block0-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 374E691D14FB507D00834CBE /* dead2_block0-hd.png */; };
+		375A10F31517D0FE004B33FD /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 375A10F21517D0FE004B33FD /* icon.png */; };
 		3782AE2E147B089C00C090AF /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3782AE2C147B089C00C090AF /* Default@2x.png */; };
 		3782AE2F147B089C00C090AF /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 3782AE2D147B089C00C090AF /* Default.png */; };
-		3782AE32147B08A500C090AF /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3782AE30147B08A500C090AF /* icon.png */; };
 		379B24031500328900008265 /* empty_block.png in Resources */ = {isa = PBXBuildFile; fileRef = 379B24021500328900008265 /* empty_block.png */; };
 		379B24051501506B00008265 /* empty_block-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 379B24041501506B00008265 /* empty_block-hd.png */; };
 		37B2862214CCB7B900FD36B4 /* prp1_block0.png in Resources */ = {isa = PBXBuildFile; fileRef = 37B2862114CCB7B900FD36B4 /* prp1_block0.png */; };
@@ -291,9 +291,9 @@
 		1F3B9A820EF2151B00286867 /* Manx_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Manx_Prefix.pch; sourceTree = SOURCE_ROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		374E691D14FB507D00834CBE /* dead2_block0-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dead2_block0-hd.png"; sourceTree = "<group>"; };
+		375A10F21517D0FE004B33FD /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../icon.png; sourceTree = "<group>"; };
 		3782AE2C147B089C00C090AF /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		3782AE2D147B089C00C090AF /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
-		3782AE30147B08A500C090AF /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		379B24021500328900008265 /* empty_block.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = empty_block.png; sourceTree = "<group>"; };
 		379B24041501506B00008265 /* empty_block-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "empty_block-hd.png"; sourceTree = "<group>"; };
 		37B2862114CCB7B900FD36B4 /* prp1_block0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = prp1_block0.png; sourceTree = "<group>"; };
@@ -809,7 +809,7 @@
 				3782AE2C147B089C00C090AF /* Default@2x.png */,
 				3782AE2D147B089C00C090AF /* Default.png */,
 				37F2A51814D8A4E800B91221 /* icon@2x.png */,
-				3782AE30147B08A500C090AF /* icon.png */,
+				375A10F21517D0FE004B33FD /* icon.png */,
 				E02BB762126CC1E0006E46A2 /* iTunesArtwork */,
 				50F414ED1069373D002A0D5E /* fps_images.png */,
 				50F414EF1069373D002A0D5E /* Info.plist */,
@@ -1249,7 +1249,6 @@
 				E02BB763126CC1E0006E46A2 /* iTunesArtwork in Resources */,
 				3782AE2E147B089C00C090AF /* Default@2x.png in Resources */,
 				3782AE2F147B089C00C090AF /* Default.png in Resources */,
-				3782AE32147B08A500C090AF /* icon.png in Resources */,
 				37B2862214CCB7B900FD36B4 /* prp1_block0.png in Resources */,
 				37B2863D14CCB8FC00FD36B4 /* background-hd.png in Resources */,
 				37B2863E14CCB8FC00FD36B4 /* background.png in Resources */,
@@ -1287,6 +1286,7 @@
 				374E691E14FB507D00834CBE /* dead2_block0-hd.png in Resources */,
 				379B24031500328900008265 /* empty_block.png in Resources */,
 				379B24051501506B00008265 /* empty_block-hd.png in Resources */,
+				375A10F31517D0FE004B33FD /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1435,7 +1435,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1492,6 +1492,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1514,7 +1515,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -1533,6 +1534,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "cocos2d libraries";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1549,6 +1551,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "cocos2d libraries";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1563,6 +1566,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "cocos2d libraries";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1588,7 +1592,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1612,6 +1616,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

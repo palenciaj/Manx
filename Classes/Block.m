@@ -28,9 +28,18 @@
 		myColor = [[NSString alloc] initWithString:color];
 		mySize = s;
         myGridPosition = g;
+        
+        myActions = [[NSMutableArray alloc] init];
+        
+        if([color isEqualToString:@"space"])
+        {
+            mySprite = [CCSprite spriteWithFile:@"empty_block.png"];
+        }
+        else 
+        {
+             mySprite = [CCSprite spriteWithFile:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]];
+        }
 		
-		
-        mySprite = [CCSprite spriteWithFile:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]];
         mySprite.anchorPoint = ccp(0,0);
 		mySprite.position = ccp(x,y);
 		[parentNode addChild:mySprite z:-1];
@@ -44,10 +53,10 @@
 {
 	//CCLOG(@"Calc Hit Area");
 	
-	int q = 9;
+	float q = 9;
 	
-	int x = mySprite.position.x + q/2;
-	int y = mySprite.position.y + q/2;
+	float x = mySprite.position.x + q/2;
+	float y = mySprite.position.y + q/2;
 	
 	return CGRectMake(x, y, 
 					  [mySprite boundingBox].size.width - q, 
@@ -55,7 +64,12 @@
 	
 }
 
--(CCFiniteTimeAction *) getActionSequence: (NSArray *) actions
+-(void)addAction:(CCAction*)action
+{
+    [myActions addObject:action];
+}
+
+-(CCFiniteTimeAction*) getActionSequence: (NSArray *) actions
 {
 	CCFiniteTimeAction *seq = nil;
 	for (CCFiniteTimeAction *anAction in actions)
@@ -72,9 +86,12 @@
 	return seq;
 }
 
--(void)runAction:(NSMutableArray*)actions
+-(void)runActions
 {
-	[mySprite runAction: [CCSequence actions:[self getActionSequence: actions],nil]];
+	if([myActions count] > 0)
+        [mySprite runAction: [CCSequence actions:[self getActionSequence: myActions],nil]];
+    
+    [myActions removeAllObjects];
 }
 
 -(void)swapToDeadBlock
@@ -96,6 +113,14 @@
     myColor = @"empty";
     
     //[mySprite removeFromParentAndCleanup:YES];
+    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:@"empty_block.png"]];
+}
+
+-(void)swapToSpacerBlock
+{
+    mySize = 1;
+    myColor = @"space";
+
     [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:@"empty_block.png"]];
 }
 
