@@ -35,6 +35,10 @@
         {
             mySprite = [CCSprite spriteWithFile:@"empty_block.png"];
         }
+        else if([color isEqualToString:@"empty"])
+        {
+            CCLOG(@"empty");
+        }
         else 
         {
              mySprite = [CCSprite spriteWithFile:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]];
@@ -97,8 +101,13 @@
 -(void)swapToDeadBlock
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[NSString stringWithFormat:@"dead%i_block0.png", mySize]]];
-	//[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_block_dead.png"]]];
+	if(mySize == 1)
+    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[NSString stringWithFormat:@"dead_%@%i_block0.png", myColor, mySize]]];
+    
+    else {
+         [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[NSString stringWithFormat:@"dead%i_block0.png", mySize]]];
+    }
+
 }
 
 -(void)swapToNormalBlock

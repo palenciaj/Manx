@@ -105,39 +105,43 @@
            {
                NSString* color = [(Block*)[blocks objectAtIndex:i] getColor];
                
-               //check block to the right
-               if([[blocks objectAtIndex:(i+1)] isKindOfClass:[Block class]] && color == [(Block*)[blocks objectAtIndex:(i+1)] getColor])
+               
+               if(![color isEqualToString:@"empty"] && ![color isEqualToString:@"space"])
                {
-                   //check block to the top
-                   if([[blocks objectAtIndex:(i+numOfGridCols)] isKindOfClass:[Block class]]  && color == [(Block*)[blocks objectAtIndex:(i+numOfGridCols)] getColor])
+                   //check block to the right
+                   if([[blocks objectAtIndex:(i+1)] isKindOfClass:[Block class]] && color == [(Block*)[blocks objectAtIndex:(i+1)] getColor])
                    {
-                       //check the block to the top right
-                       if([[blocks objectAtIndex:(i+numOfGridCols+1)] isKindOfClass:[Block class]] && color == [(Block*)[blocks objectAtIndex:(i+numOfGridCols+1)] getColor])
+                       //check block to the top
+                       if([[blocks objectAtIndex:(i+numOfGridCols)] isKindOfClass:[Block class]]  && color == [(Block*)[blocks objectAtIndex:(i+numOfGridCols)] getColor])
                        {
-                           CCLOG(@"2x2 Detected!! At %i, %i", col, row);
-                           
-                           Block* newBlock = [self createNewBlockAtPositionX:[(Block*)[blocks objectAtIndex:i] getPosition].x 
-                                                                   positionY:[(Block*)[blocks objectAtIndex:i] getPosition].y 
-                                                                   withColor:color 
-                                                              atGridPosition:i
-                                                                    withSize:2];
-                           
-                           [(Block*)[blocks objectAtIndex:i] remove];
-                           [blocks replaceObjectAtIndex:i withObject:newBlock];
-                           
-                           //remove all other smaller blocks and set them to NULL in the blocks array so the order holds
-                           /*
-                           [self removeBlockAndSetPostionToNull:(i+1)];
-                           [self removeBlockAndSetPostionToNull:(i+numOfGridCols)];
-                           [self removeBlockAndSetPostionToNull:(i+numOfGridCols+1)];
-                            */
-                           [(Block*)[blocks objectAtIndex:(i+1)] swapToEmptyBlock];
-                           [(Block*)[blocks objectAtIndex:(i+numOfGridCols)] swapToEmptyBlock];
-                           [(Block*)[blocks objectAtIndex:(i+numOfGridCols+1)] swapToEmptyBlock];
-                           
+                           //check the block to the top right
+                           if([[blocks objectAtIndex:(i+numOfGridCols+1)] isKindOfClass:[Block class]] && color == [(Block*)[blocks objectAtIndex:(i+numOfGridCols+1)] getColor])
+                           {
+                               CCLOG(@"2x2 Detected!! At %i, %i", col, row);
+                               
+                               Block* newBlock = [self createNewBlockAtPositionX:[(Block*)[blocks objectAtIndex:i] getPosition].x 
+                                                                       positionY:[(Block*)[blocks objectAtIndex:i] getPosition].y 
+                                                                       withColor:color 
+                                                                  atGridPosition:i
+                                                                        withSize:2];
+                               
+                               [(Block*)[blocks objectAtIndex:i] remove];
+                               [blocks replaceObjectAtIndex:i withObject:newBlock];
+                               
+                               //remove all other smaller blocks and set them to NULL in the blocks array so the order holds
+                               /*
+                                [self removeBlockAndSetPostionToNull:(i+1)];
+                                [self removeBlockAndSetPostionToNull:(i+numOfGridCols)];
+                                [self removeBlockAndSetPostionToNull:(i+numOfGridCols+1)];
+                                */
+                               [(Block*)[blocks objectAtIndex:(i+1)] swapToEmptyBlock];
+                               [(Block*)[blocks objectAtIndex:(i+numOfGridCols)] swapToEmptyBlock];
+                               [(Block*)[blocks objectAtIndex:(i+numOfGridCols+1)] swapToEmptyBlock];
+                               
+                           }
                        }
                    }
-               }
+           }
            }
        }
     }
@@ -671,7 +675,7 @@
 -(void)loadTestArray
 {
     test = [[NSArray alloc] initWithObjects:
-            [NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4], nil];;
+            [NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4], nil];
 }
 
 -(id) init
