@@ -28,11 +28,11 @@
 	
 	colors = [[NSArray alloc] initWithObjects:
 			  @"empty", 
-			  @"blu",
-			  @"red", 
+			  @"ylw",
+			  @"prp", 
 			  @"grn", 
-			  @"prp",
-			  @"ylw", nil];
+			  @"blu",
+			  @"red", nil];
 }
 /*
 - (void) drawRect:(CGRect) rect
@@ -66,24 +66,12 @@
 	return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
 }
 
--(Block*)createSpacerBlock:(Block*)block atGridPosition:(int)gp
-{
-    return [Block blockWithParentNode:blockLayer withColor:@"space" atPositionX:[block getPosition].x atPositionY:[block getPosition].y atGridPosition:gp withSize:1];
-}
-
 -(Block*)createNewBlockAtPositionX:(float)x positionY:(float)y withColor:(NSString*)c atGridPosition:(int)g withSize:(int)s
 {
     return [Block blockWithParentNode:blockLayer withColor:c atPositionX:x atPositionY:y atGridPosition:g withSize:s];
 }
 
--(void)removeBlockAndSetPostionToNull:(int)p
-{
-    [(Block*)[blocks objectAtIndex:p] remove];
-    [blocks replaceObjectAtIndex:p withObject:[NSNull null]];
-    
-}
-
--(void)detectBlockFusion
+-(void)detectBlockClusters
 {
     int count = [blocks count];
     
@@ -119,25 +107,6 @@
                            {
                                CCLOG(@"2x2 Detected!! At %i, %i", col, row);
                                
-                               Block* newBlock = [self createNewBlockAtPositionX:[(Block*)[blocks objectAtIndex:i] getPosition].x 
-                                                                       positionY:[(Block*)[blocks objectAtIndex:i] getPosition].y 
-                                                                       withColor:color 
-                                                                  atGridPosition:i
-                                                                        withSize:2];
-                               
-                               [(Block*)[blocks objectAtIndex:i] remove];
-                               [blocks replaceObjectAtIndex:i withObject:newBlock];
-                               
-                               //remove all other smaller blocks and set them to NULL in the blocks array so the order holds
-                               /*
-                                [self removeBlockAndSetPostionToNull:(i+1)];
-                                [self removeBlockAndSetPostionToNull:(i+numOfGridCols)];
-                                [self removeBlockAndSetPostionToNull:(i+numOfGridCols+1)];
-                                */
-                               [(Block*)[blocks objectAtIndex:(i+1)] swapToEmptyBlock];
-                               [(Block*)[blocks objectAtIndex:(i+numOfGridCols)] swapToEmptyBlock];
-                               [(Block*)[blocks objectAtIndex:(i+numOfGridCols+1)] swapToEmptyBlock];
-                               
                            }
                        }
                    }
@@ -151,19 +120,19 @@
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	
-	/*
+	
     Block* myBlock = [self createNewBlockAtPositionX:x 
                                            positionY:y 
                                            withColor:[self pickBlockColor] 
                                       atGridPosition:[blocks count] 
                                             withSize:s];
-    */
+    /*
     Block* myBlock = [self createNewBlockAtPositionX:x 
                                            positionY:y 
                                            withColor:[colors objectAtIndex:[[test objectAtIndex:[blocks count]] intValue]] 
                                       atGridPosition:[blocks count] 
                                             withSize:s];
-	
+	*/
 	[blocks addObject:myBlock];
 }
 
@@ -189,45 +158,16 @@
 	for(int i = 0; i < numOfGridRows; i++)
 	{
 		x = offSet;
-        //NSMutableArray* array = [[NSMutableArray alloc] init];
 		
 		for(int j = 0; j < numOfGridCols; j++)
 		{
-            //[array addObject:[self addNewBlockAtPositionX:x positionY:y withSize:1]];
 			[self addNewBlockAtPositionX:x positionY:y withSize:1];
             
 			x += blockWidth;
 		}
-        //[blocks addObject:array];
+        
 		y += blockWidth;
 	}
-    
-    [self detectBlockFusion];
-}
-
-- (BOOL)checkIfSprite:(CCSprite*)s1 touches:(CCSprite*)s2
-{
-	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-	
-	if(s1.position.x == s2.position.x)
-	{
-		return((s1.position.y + s1.contentSize.height == s2.position.y) ||
-			   (s1.position.y - s2.contentSize.height == s2.position.y));
-	}
-	else if(s1.position.x + s1.contentSize.width == s2.position.x)
-	{
-		return((s1.position.y + s1.contentSize.height == s2.position.y) ||
-			   (s1.position.y - s2.contentSize.height == s2.position.y) ||
-			   (s1.position.y == s2.position.y));
-	}
-	else if(s1.position.x - s2.contentSize.width == s2.position.x)
-	{
-		return((s1.position.y + s1.contentSize.height == s2.position.y) ||
-			   (s1.position.y - s2.contentSize.height == s2.position.y) ||
-			   (s1.position.y == s2.position.y));
-	}
-    
-	return NO;
 }
 
 -(BOOL)checkIfBlock:(Block*)b1 touches:(Block*)b2
@@ -367,18 +307,14 @@
     // create array size of # of columns and full of 0s
     NSMutableArray* fallCountByColumn = [[NSMutableArray alloc] initWithCapacity:numOfGridCols];
     NSMutableArray* fallCountByColumnTotal = [[NSMutableArray alloc] initWithCapacity:numOfGridCols];
-    NSMutableArray* holes = [[NSMutableArray alloc] initWithCapacity:numOfGridCols];
-    NSMutableArray* fallCountByColumnWithHoles = [[NSMutableArray alloc] initWithCapacity:numOfGridCols];
-    
-    NSMutableArray* spaces = [[NSMutableArray alloc] init];
 
     [fallCountByColumnTotal removeAllObjects];
-    [holes removeAllObjects];
+    //[holes removeAllObjects];
     
     for(int i = 0; i < numOfGridCols; i++)
     {
         [fallCountByColumnTotal addObject:[NSNumber numberWithInt:0]];
-        [holes addObject:[NSNumber numberWithInt:0]];
+        //[holes addObject:[NSNumber numberWithInt:0]];
 
     }
     
@@ -392,11 +328,11 @@
         
         //reset so all values are 0
         [fallCountByColumn removeAllObjects];
-        [fallCountByColumnWithHoles removeAllObjects];
+        //[fallCountByColumnWithHoles removeAllObjects];
         for(int i = 0; i < numOfGridCols; i++)
         {
             [fallCountByColumn addObject:[NSNumber numberWithInt:0]];
-            [fallCountByColumnWithHoles addObject:[NSNumber numberWithInt:0]];
+            //[fallCountByColumnWithHoles addObject:[NSNumber numberWithInt:0]];
         }
         
         //count per column the number of blocks (size of removed block) above blocks could potentially fall
@@ -413,87 +349,16 @@
             }
         }
         
-        //add in any empty spaces that exist
-        for(int i = (row * numOfGridCols); i < ((row + 1) * numOfGridCols); i++)
-        {
-            Block* block = [blocks objectAtIndex:i];
-            
-            if([[block getColor] isEqualToString:@"space"])
-            {
-                int currentValue = [[fallCountByColumn objectAtIndex:([block getGridPosition] % numOfGridCols)] intValue];
-                
-                [fallCountByColumn replaceObjectAtIndex:([block getGridPosition] % numOfGridCols) withObject:[NSNumber numberWithInt:(currentValue + [block getSize])]];
-            }
-        } 
-        
-        //add existing holes to fallCount and reset holes
-        for(int i = 0; i < [fallCountByColumn count]; i++)
-        {
-            [fallCountByColumnWithHoles replaceObjectAtIndex:i withObject:[NSNumber numberWithInt:[[fallCountByColumn objectAtIndex:i] intValue] + [[holes objectAtIndex:i] intValue]]];
-            
-            [holes replaceObjectAtIndex:i withObject:[NSNumber numberWithInt:0]];
-        }
-        
         //iterate through all blocks above the current row
         for(int b = ((row + 1) * numOfGridCols); b < [blocks count]; b++)
         {
             Block* block = [blocks objectAtIndex:b];
             
-            //if([block isKindOfClass:[Block class]]  && !([[block getColor] isEqualToString:@"empty"]) && ![touchedBlocks containsObject:block])
-            if([block isKindOfClass:[Block class]] && !([[block getColor] isEqualToString:@"empty"]) && !([[block getColor] isEqualToString:@"space"]) && ![touchedBlocks containsObject:block])
+            if([block isKindOfClass:[Block class]] && ![touchedBlocks containsObject:block])
             {
                 int col = ([block getGridPosition] % numOfGridCols);
                 
                 int fallAmount = [[fallCountByColumn objectAtIndex:col] intValue];
-                
-                //if block is bigger than 1x1 need to see how far it is possible for it to fall and adjust array for all blocks above the larger block
-                if([block getSize] > 1)
-                {
-                    //for blocks bigger than 1x1 need to consider hole that have been made
-                    fallAmount = [[fallCountByColumnWithHoles objectAtIndex:col] intValue];
-                    
-                    
-                    //for each colum the block spans see what the smallest value in fallCountByColumnWithHoles is
-                    if(fallAmount != 0) // don't need to check if already at smallest possiblie (0)
-                    {
-                        for(int i = 1; i < [block getSize]; i++)
-                        {
-                            if([[fallCountByColumnWithHoles objectAtIndex:(col + i)] intValue] < fallAmount)
-                            {
-                                fallAmount = [[fallCountByColumnWithHoles objectAtIndex:(col + i)] intValue];
-                            }
-                        }
-                    }
-                    
-                    //once smallest amount is found keep track of where "holes" are created and change all values for columns that the block spans to the smallest value
-                    
-                    for(int i = 0; i < [block getSize]; i++)
-                    {
-                        int holeSpace = [[fallCountByColumnWithHoles objectAtIndex:(col+i)] intValue] - fallAmount + [[holes objectAtIndex:(col+i)] intValue];
-                        
-                        //these are holes that still have the potential to be filled
-                        if(([block getGridPosition]/numOfGridCols) > (row+1))
-                        {
-                             [holes replaceObjectAtIndex:(col+i) withObject:[NSNumber numberWithInt:holeSpace]];
-                        }
-                        
-                        //this would be a permanent hole after this drop
-                        else 
-                        {
-                            if(holeSpace > 0)
-                            {
-                                int gridPostion = [block getGridPosition] + i - numOfGridCols;
-                                
-                                [spaces addObject:[NSNumber numberWithInt:gridPostion]];
-                            }
-                        }
-                        
-                       
-                        [fallCountByColumnWithHoles replaceObjectAtIndex:(col+i) withObject:[NSNumber numberWithInt:fallAmount]];
-                        [fallCountByColumn replaceObjectAtIndex:(col+i) withObject:[NSNumber numberWithInt:fallAmount]];
-
-                    }
-                }
                 
                 //make the block and corresponding "empty" blocks fall if it needs to
                 if(fallAmount != 0)
@@ -502,16 +367,6 @@
                     
                     [falling addObject:block];
                     
-                    // if 2x2 or bigger make all "empty" surrounding blocks fall with
-                    for(int i = 1; i < [block getSize]; i++)
-                    {
-                        [falling addObject:[blocks objectAtIndex:[block getGridPosition] + i]];
-                        [falling addObject:[blocks objectAtIndex:[block getGridPosition] + (numOfGridCols * i)]];
-                        [falling addObject:[blocks objectAtIndex:[block getGridPosition]+ (numOfGridCols * i) + i]];
-                    }
-                    
-                    CCLOG(@"Row: %i, Falling: %@", row, falling);
-                    
                     for(Block* fallingBlock in falling)
                     {
                         for(int i = 0; i < fallAmount; i++)
@@ -519,8 +374,6 @@
                             //block will move 1 block width at a time so speed is consistant
                             [fallingBlock addAction:[CCMoveBy actionWithDuration:.09 
                                                                  position:ccp(0,-1 * blockWidth)]];
-                            
-                            CCLOG(@"Added action to %@", block);
                             
                             //update grid postion
                             [fallingBlock setGridPosition:([fallingBlock getGridPosition] - numOfGridCols)];
@@ -570,41 +423,13 @@
         }
     }
     
-    id callFunc = [CCCallFunc actionWithTarget:self selector:@selector(detectBlockFusion)];
-
     //run all fall animations
-    /*
     for(Block* block in movedBlocks)
     {
         [blocks replaceObjectAtIndex:[block getGridPosition] withObject:block];
-        [block addAction:callFunc];
         [block runActions];
     }
-    */
-    for(int i = 0; i < [movedBlocks count]; i++)
-    {
-        Block* block = [movedBlocks objectAtIndex:i];
-        
-        [blocks replaceObjectAtIndex:[block getGridPosition] withObject:block];
-        
-        if(i == [movedBlocks count] - 1)
-        [block addAction:callFunc];
-        
-        [block runActions];
-    }
-    
-    for(NSNumber* n in spaces)
-    {
-        int i = [n intValue];
-        
-        //check this becuase in some cases "empty" blocks can get added incorrectly
-        if([(Block*)[blocks objectAtIndex:i] getGridPosition] != i)
-        {
-            [blocks replaceObjectAtIndex:i withObject:[self createSpacerBlock:[blocks objectAtIndex:i] atGridPosition:i]];
-        }
-    }
-    
-    [spaces removeAllObjects];
+
     [movedBlocks removeAllObjects];
 }
 
@@ -642,11 +467,6 @@
             [block hide];			
 		}
 		[self makeBlocksFall];
-        
-        for (Block* block in touchedBlocks) 
-		{
-			[block swapToSpacerBlock];			
-		}
 	}
 	
 	else 
@@ -669,7 +489,6 @@
 	blockCount = 0;
     
     CCLOG(@"Number of blocks:%i", [blocks count]);
-    //[self detectBlockFusion];
 }
 
 -(void)loadTestArray
@@ -693,14 +512,14 @@
 		
 		[self addChild:blockLayer z:-1];
 		
-        /*
+        
 		[CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_RGB565];
         CCSprite *background = [CCSprite spriteWithFile:@"background.png"];
         background.anchorPoint = ccp(0,0);
         [self addChild:background z:-2];
         [CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_Default];
 		CCLOG(@"background loaded");
-         */
+         
         
 		[self loadTestArray];
 		

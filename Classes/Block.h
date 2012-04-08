@@ -26,8 +26,6 @@
 
 -(void)swapToDeadBlock;
 -(void)swapToNormalBlock;
--(void)swapToEmptyBlock;
--(void)swapToSpacerBlock;
 
 -(void)addAction:(CCAction*)action;
 -(void)runActions;
