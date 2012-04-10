@@ -16,6 +16,8 @@
 	int mySize;
     int myGridPosition;
     
+    CCLabelBMFont* scoreLabel;
+    
     NSMutableArray* myActions;
 	
 	CCNode* myParent;
@@ -26,6 +28,9 @@
 
 -(void)swapToDeadBlock;
 -(void)swapToNormalBlock;
+
+-(void)showScore:(int)score;
+-(void)removeScore;
 
 -(void)addAction:(CCAction*)action;
 -(void)runActions;

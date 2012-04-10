@@ -34,7 +34,7 @@
         mySprite = [CCSprite spriteWithFile:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]];
         
 		
-        mySprite.anchorPoint = ccp(0,0);
+        //mySprite.anchorPoint = ccp(0,0);
 		mySprite.position = ccp(x,y);
 		[parentNode addChild:mySprite z:-1];
         
@@ -47,10 +47,10 @@
 {
 	//CCLOG(@"Calc Hit Area");
 	
-	float q = 9;
+	float q = 10;
 	
-	float x = mySprite.position.x + q/2;
-	float y = mySprite.position.y + q/2;
+	float x = mySprite.position.x - (mySprite.contentSize.width/2) + q/2;
+	float y = mySprite.position.y - (mySprite.contentSize.height/2) + q/2;
 	
 	return CGRectMake(x, y, 
 					  [mySprite boundingBox].size.width - q, 
@@ -101,6 +101,21 @@
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]]];
 }
+
+-(void)showScore:(int)score
+{
+    scoreLabel = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"+%i",score] fntFile:@"smallNumbers.fnt"];
+    
+    scoreLabel.position = CGPointMake(mySprite.position.x, mySprite.position.y + mySprite.contentSize.height/2);
+    
+    [myParent addChild:scoreLabel];
+}
+
+-(void)removeScore
+{
+    [scoreLabel removeFromParentAndCleanup:YES];
+}
+
 
 -(CCSprite*)getSprite
 {

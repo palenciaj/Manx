@@ -110,7 +110,7 @@
                            }
                        }
                    }
-           }
+               }
            }
        }
     }
@@ -152,12 +152,12 @@
 	
 	offSet = (winSize.width - blockWidth * numOfGridCols) / 2;
 	
-	float x = offSet;
-	float y = 0;
+	float x = offSet + blockWidth/2;
+	float y = blockWidth/2;
 	
 	for(int i = 0; i < numOfGridRows; i++)
 	{
-		x = offSet;
+		x = offSet + blockWidth/2;
 		
 		for(int j = 0; j < numOfGridCols; j++)
 		{
@@ -246,6 +246,7 @@
 	   CGRectContainsPoint([(Block*)[touchedBlocks objectAtIndex:[touchedBlocks count]-2] calcHitArea],touchLocation))
 	{
         [(Block*)[touchedBlocks lastObject] swapToNormalBlock];
+        [(Block*)[touchedBlocks lastObject] removeScore];
         [self removeBlockFromColCount:(Block*)[touchedBlocks lastObject]];
         [touchedBlocks removeLastObject];
 		blockCount--;
@@ -267,13 +268,11 @@
             {            
                 if([touchedBlocks count] > 0)
                 {
-                    //CCLOG(@"Next Sprite");
-                    
-                    //if([self checkIfSprite:[(Block*)[touchedBlocks lastObject] getSprite] touches:[block getSprite]])
                     if([self checkIfBlock:[touchedBlocks lastObject] touches:block])
                     {
                         //CCLOG(@"Sprites Touch");
                         [block swapToDeadBlock];
+                        [block showScore:10];
                         [touchedBlocks addObject:block];
                         [self addBlockToColCount:block];
                         blockCount++;
@@ -289,6 +288,7 @@
                 {
                     //CCLOG(@"First Sprite");
                     [block swapToDeadBlock];
+                    [block showScore:10];
                     [touchedBlocks addObject:block];
                     [self addBlockToColCount:block];
                     blockCount++;
@@ -400,8 +400,8 @@
         for(int j = 0; j < [[fallCountByColumnTotal objectAtIndex:i] intValue]; j++)
         {
             //calculate needed values, gp is the block's final position
-            float x = offSet + (i * blockWidth);
-            float y = (numOfGridRows + j) * blockWidth;
+            float x = offSet + (i * blockWidth) + blockWidth/2;
+            float y = (numOfGridRows + j) * blockWidth + blockWidth/2;
             int gp = (((numOfGridRows + j) * numOfGridCols) + i) - (numOfGridCols * [[fallCountByColumnTotal objectAtIndex:i] intValue]);
             
             
@@ -462,8 +462,12 @@
 	
 	if(blockCount >= 3)
 	{
+        score = score + (blockCount * 10);
+        [scoreLabel setString:[NSString stringWithFormat:@"%i", score]];
+        
         for (Block* block in touchedBlocks) 
 		{
+            [block removeScore];
             [block hide];			
 		}
 		[self makeBlocksFall];
@@ -474,6 +478,7 @@
         for (Block* block in touchedBlocks) 
 		{
 			[block swapToNormalBlock];
+            [block removeScore];
 		}
 	}
 
@@ -526,7 +531,7 @@
         [self loadBlockColors];
 		touchedColor = @"none";
 		blockCount = 0;
-		//touchHappening = NO;
+		score = 0;
 		
 		//top menu
 		CCSprite *topBar = [CCSprite spriteWithFile:@"top_bar.png"];
@@ -545,8 +550,9 @@
 		button.position = CGPointZero;
 		[self addChild:button];
 		
-		
-		//[button release];
+		scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"largeNumbers.fnt"];
+        scoreLabel.position = ccp(winSize.width/2, winSize.height - scoreLabel.contentSize.height);
+        [self addChild:scoreLabel];
 		//end top menu
 		
 		blocks = [[NSMutableArray alloc] initWithCapacity:(numOfGridCols*numOfGridRows)];
@@ -567,8 +573,12 @@
 
 - (void)pauseButtonTapped:(id)sender 
 {
+	score = 0;
+    [scoreLabel setString:[NSString stringWithFormat:@"%i", score]];
+
 	
-	for (Block* block in blocks) 
+    
+    for (Block* block in blocks) 
 	{
 		if([block isKindOfClass:[Block class]] && !([[block getColor] isEqualToString:@"empty"]))
             [block remove];
