@@ -36,7 +36,7 @@
 		
         //mySprite.anchorPoint = ccp(0,0);
 		mySprite.position = ccp(x,y);
-		[parentNode addChild:mySprite z:-1];
+		[parentNode addChild:mySprite z:-2];
         
 	}
 	
@@ -92,7 +92,7 @@
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 
-    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[NSString stringWithFormat:@"dead_%@%i_block0.png", myColor, mySize]]];
+    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_dead_block0.png", mySize]]]];
     
 }
 
@@ -101,21 +101,21 @@
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]]];
 }
-
+/*
 -(void)showScore:(int)score
 {
     scoreLabel = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"+%i",score] fntFile:@"smallNumbers.fnt"];
     
     scoreLabel.position = CGPointMake(mySprite.position.x, mySprite.position.y + mySprite.contentSize.height/2);
     
-    [myParent addChild:scoreLabel];
+    [myParent addChild:scoreLabel z:1];
 }
 
 -(void)removeScore
 {
     [scoreLabel removeFromParentAndCleanup:YES];
 }
-
+*/
 
 -(CCSprite*)getSprite
 {

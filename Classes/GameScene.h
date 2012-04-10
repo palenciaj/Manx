@@ -21,8 +21,10 @@
 	NSMutableArray* touchedBlocks;
     NSMutableArray* touchedBlockColumns;
     
+    int totalScore;
     int score;
     
+    CCLabelBMFont* totalScoreLabel;
     CCLabelBMFont* scoreLabel;
     
     NSArray* test;

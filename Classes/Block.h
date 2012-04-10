@@ -29,8 +29,8 @@
 -(void)swapToDeadBlock;
 -(void)swapToNormalBlock;
 
--(void)showScore:(int)score;
--(void)removeScore;
+//-(void)showScore:(int)score;
+//-(void)removeScore;
 
 -(void)addAction:(CCAction*)action;
 -(void)runActions;

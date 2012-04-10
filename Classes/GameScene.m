@@ -9,6 +9,8 @@
 #import "GameScene.h"
 #import "Block.h"
 
+#import "SimpleAudioEngine.h"
+
 
 @implementation GameScene
 
@@ -28,11 +30,10 @@
 	
 	colors = [[NSArray alloc] initWithObjects:
 			  @"empty", 
-			  @"ylw",
+			  @"red",
 			  @"prp", 
 			  @"grn", 
-			  @"blu",
-			  @"red", nil];
+			  @"blu", nil];
 }
 /*
 - (void) drawRect:(CGRect) rect
@@ -61,9 +62,14 @@
 
 -(NSString*) pickBlockColor
 {
-	#define NUM_OF_BLOCK_COLORS 5
+	#define NUM_OF_BLOCK_COLORS 4
 	
 	return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
+}
+
+-(void)playBlockTouch
+{
+    [[SimpleAudioEngine sharedEngine] playEffect:@"Block_touch.wav"];
 }
 
 -(Block*)createNewBlockAtPositionX:(float)x positionY:(float)y withColor:(NSString*)c atGridPosition:(int)g withSize:(int)s
@@ -237,6 +243,16 @@
     //CCLOG(@"%@",touchedBlockColumns);
 }
 
+-(void)showScore:(CGPoint)touchLocation 
+{
+    score = blockCount * 10;
+    
+    [scoreLabel setString:[NSString stringWithFormat:@"+%i", score]];
+    
+    scoreLabel.position = ccp(touchLocation.x, touchLocation.y + 20);
+    scoreLabel.visible = YES;
+}
+
 - (void)selectSpriteForTouch:(CGPoint)touchLocation 
 {
     //CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
@@ -246,7 +262,6 @@
 	   CGRectContainsPoint([(Block*)[touchedBlocks objectAtIndex:[touchedBlocks count]-2] calcHitArea],touchLocation))
 	{
         [(Block*)[touchedBlocks lastObject] swapToNormalBlock];
-        [(Block*)[touchedBlocks lastObject] removeScore];
         [self removeBlockFromColCount:(Block*)[touchedBlocks lastObject]];
         [touchedBlocks removeLastObject];
 		blockCount--;
@@ -272,7 +287,7 @@
                     {
                         //CCLOG(@"Sprites Touch");
                         [block swapToDeadBlock];
-                        [block showScore:10];
+                        [self playBlockTouch];
                         [touchedBlocks addObject:block];
                         [self addBlockToColCount:block];
                         blockCount++;
@@ -288,7 +303,7 @@
                 {
                     //CCLOG(@"First Sprite");
                     [block swapToDeadBlock];
-                    [block showScore:10];
+                    [self playBlockTouch];
                     [touchedBlocks addObject:block];
                     [self addBlockToColCount:block];
                     blockCount++;
@@ -440,7 +455,8 @@
 	
 	touchedColor = @"none";
 	blockCount = 0;
-	
+	score = 0;
+    
 	CGPoint touchLocation = [self convertTouchToNodeSpace:touch];
 	CCLOG(@"touch location x:%f y:%f", touchLocation.x, touchLocation.y);
     [self selectSpriteForTouch:touchLocation];      
@@ -450,10 +466,16 @@
 {
 	CGPoint touchLocation = [self convertTouchToNodeSpace:touch];
     [self selectSpriteForTouch:touchLocation]; 
+    if(blockCount >= 3)
+    {
+        [self showScore:touchLocation];
+    }
 }
 - (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {	
-	if(blockCount == 0)
+    scoreLabel.visible = NO;
+    
+    if(blockCount == 0)
 	{
 		CCLOG(@"blockCount is 0!!");
 		
@@ -462,12 +484,11 @@
 	
 	if(blockCount >= 3)
 	{
-        score = score + (blockCount * 10);
-        [scoreLabel setString:[NSString stringWithFormat:@"%i", score]];
+        totalScore = totalScore + score;
+        [totalScoreLabel setString:[NSString stringWithFormat:@"%i", totalScore]];
         
         for (Block* block in touchedBlocks) 
 		{
-            [block removeScore];
             [block hide];			
 		}
 		[self makeBlocksFall];
@@ -478,7 +499,6 @@
         for (Block* block in touchedBlocks) 
 		{
 			[block swapToNormalBlock];
-            [block removeScore];
 		}
 	}
 
@@ -521,7 +541,7 @@
 		[CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_RGB565];
         CCSprite *background = [CCSprite spriteWithFile:@"background.png"];
         background.anchorPoint = ccp(0,0);
-        [self addChild:background z:-2];
+        [self addChild:background z:-4];
         [CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_Default];
 		CCLOG(@"background loaded");
          
@@ -531,29 +551,22 @@
         [self loadBlockColors];
 		touchedColor = @"none";
 		blockCount = 0;
-		score = 0;
+		totalScore = 0;
 		
 		//top menu
-		CCSprite *topBar = [CCSprite spriteWithFile:@"top_bar.png"];
-		topBar.position = ccp(winSize.width/2, winSize.height - (topBar.contentSize.height / 2));
-		[self addChild:topBar];
-		
-		CCMenuItem *pauseButton = [CCMenuItemImage
-								   itemFromNormalImage:@"pause_button.png" selectedImage:@"pause_button.png"
-								   target:self selector:@selector(pauseButtonTapped:)];
-		
-		pauseButton.position = ccp(winSize.width - pauseButton.contentSize.width/2, 
-								   winSize.height - pauseButton.contentSize.height/2);
+		CCSprite* fightBarBg = [CCSprite spriteWithFile:@"fight_bar_bg.png"];
+		fightBarBg.position = ccp(winSize.width/2, winSize.height - (fightBarBg.contentSize.height / 2));
+		[self addChild:fightBarBg z:2];
 		
 		
-		CCMenu *button = [CCMenu menuWithItems:pauseButton, nil];
-		button.position = CGPointZero;
-		[self addChild:button];
-		
-		scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"largeNumbers.fnt"];
-        scoreLabel.position = ccp(winSize.width/2, winSize.height - scoreLabel.contentSize.height);
-        [self addChild:scoreLabel];
+		totalScoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"largeNumbers.fnt"];
+        totalScoreLabel.position = ccp(winSize.width/2, winSize.height - totalScoreLabel.contentSize.height);
+        [self addChild:totalScoreLabel z:3];
 		//end top menu
+        
+        scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"smallNumbers.fnt"];
+        scoreLabel.visible = NO;
+        [self  addChild:scoreLabel z:3];
 		
 		blocks = [[NSMutableArray alloc] initWithCapacity:(numOfGridCols*numOfGridRows)];
 		touchedBlocks = [[NSMutableArray alloc] init];
@@ -573,8 +586,8 @@
 
 - (void)pauseButtonTapped:(id)sender 
 {
-	score = 0;
-    [scoreLabel setString:[NSString stringWithFormat:@"%i", score]];
+	totalScore = 0;
+    [totalScoreLabel setString:[NSString stringWithFormat:@"%i", totalScore]];
 
 	
     
@@ -595,9 +608,11 @@
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	
 	[blocks release];
-	//[deadBlocks release];
 	[colors release];
 	[touchedBlocks release];
+    
+    [scoreLabel release];
+    [totalScoreLabel release];
 	
 	[super dealloc];
 }
