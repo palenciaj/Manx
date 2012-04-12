@@ -69,7 +69,7 @@
 
 -(void)playBlockTouch
 {
-    [[SimpleAudioEngine sharedEngine] playEffect:@"Block_touch.wav"];
+    [[SimpleAudioEngine sharedEngine] playEffect:@"Block_touch.caf"];
 }
 
 -(Block*)createNewBlockAtPositionX:(float)x positionY:(float)y withColor:(NSString*)c atGridPosition:(int)g withSize:(int)s
@@ -285,12 +285,15 @@
                 {
                     if([self checkIfBlock:[touchedBlocks lastObject] touches:block])
                     {
-                        //CCLOG(@"Sprites Touch");
+                        blockCount++;
                         [block swapToDeadBlock];
                         [self playBlockTouch];
                         [touchedBlocks addObject:block];
                         [self addBlockToColCount:block];
-                        blockCount++;
+                        
+                        //draw touch line
+                        
+                        
                     }
                     else 
                     {
@@ -317,6 +320,8 @@
 
 -(void)makeBlocksFall
 {
+    CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
+    
     int blockWidth = [[CCSprite spriteWithFile:[[colors objectAtIndex:1] stringByAppendingString:@"1_block0.png"]] boundingBox].size.width;
     
     // create array size of # of columns and full of 0s
@@ -446,6 +451,8 @@
     }
 
     [movedBlocks removeAllObjects];
+    
+    [self touchEndedCleanUp];
 }
 
 
@@ -471,6 +478,46 @@
         [self showScore:touchLocation];
     }
 }
+
+-(CCFiniteTimeAction*) getActionSequence: (NSArray *) actions
+{
+	CCFiniteTimeAction *seq = nil;
+	for (CCFiniteTimeAction *anAction in actions)
+	{
+		if (!seq)
+		{
+			seq = anAction;
+		}
+		else
+		{
+			seq = [CCSequence actionOne:seq two:anAction];
+		}
+	}
+	return seq;
+}
+
+
+-(void)hideBlock:(id)sender data:(Block*)b
+{
+    [b hide];
+}
+
+-(void)touchEndedCleanUp
+{
+    [touchedBlocks removeAllObjects];
+    
+    [touchedBlockColumns removeAllObjects];
+    for(int j = 0; j < numOfGridCols; j++)
+    {
+        [touchedBlockColumns addObject:[NSNumber numberWithInt:0]];
+    }
+	
+    touchedColor = @"none";
+	blockCount = 0;
+    
+    CCLOG(@"Number of blocks:%i", [blocks count]);
+}
+
 - (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {	
     scoreLabel.visible = NO;
@@ -487,11 +534,20 @@
         totalScore = totalScore + score;
         [totalScoreLabel setString:[NSString stringWithFormat:@"%i", totalScore]];
         
+        NSMutableArray* hideActions = [[NSMutableArray alloc] init];
+        
         for (Block* block in touchedBlocks) 
 		{
-            [block hide];			
+            //[block hide];
+            [hideActions addObject:[CCCallFuncND actionWithTarget:self selector:@selector(hideBlock:data:) data:(Block*)block]];
+            [hideActions addObject:[CCDelayTime actionWithDuration:.05]];
 		}
-		[self makeBlocksFall];
+        [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(makeBlocksFall)]];
+        
+        [self runAction: [CCSequence actions:[self getActionSequence: hideActions],nil]];
+
+        
+		//[self makeBlocksFall];
 	}
 	
 	else 
@@ -500,20 +556,8 @@
 		{
 			[block swapToNormalBlock];
 		}
+    [self touchEndedCleanUp];
 	}
-
-	[touchedBlocks removeAllObjects];
-    
-    [touchedBlockColumns removeAllObjects];
-    for(int j = 0; j < numOfGridCols; j++)
-    {
-        [touchedBlockColumns addObject:[NSNumber numberWithInt:0]];
-    }
-	
-    touchedColor = @"none";
-	blockCount = 0;
-    
-    CCLOG(@"Number of blocks:%i", [blocks count]);
 }
 
 -(void)loadTestArray
@@ -577,7 +621,9 @@
             [touchedBlockColumns addObject:[NSNumber numberWithInt:0]];
         }
 		
-		[[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
+		[[SimpleAudioEngine sharedEngine] preloadEffect:@"Block_touch.caf"];
+        
+        [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
 		
 		[self createAndDisplayGrid];
 	}
