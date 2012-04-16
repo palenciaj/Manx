@@ -31,7 +31,7 @@
         
         myActions = [[NSMutableArray alloc] init];
         
-        mySprite = [CCSprite spriteWithFile:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]];
+        mySprite = [CCSprite spriteWithFile:[myColor stringByAppendingString:@"_block0.png"]];
         
 		
         //mySprite.anchorPoint = ccp(0,0);
@@ -92,14 +92,14 @@
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 
-    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_dead_block0.png", mySize]]]];
+    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_dead_block0.png"]]];
     
 }
 
 -(void)swapToNormalBlock
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]]];
+	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_block0.png"]]];
 }
 /*
 -(void)showScore:(int)score
@@ -162,7 +162,7 @@
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 
 	myColor = color; //needs to be mutable?
-	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:[NSString stringWithFormat:@"%i_block0.png", mySize]]]];
+	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"%i_block0.png"]]];
 }
 
 -(void)hide

@@ -29,7 +29,7 @@
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	
 	colors = [[NSArray alloc] initWithObjects:
-			  @"empty", 
+			  @"mul", 
 			  @"red",
 			  @"prp", 
 			  @"grn", 
@@ -63,8 +63,17 @@
 -(NSString*) pickBlockColor
 {
 	#define NUM_OF_BLOCK_COLORS 4
-	
-	return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
+    
+    //make 10% change of getting mult. block
+    if(((arc4random() % 100)) < 7)
+    {
+        return [colors objectAtIndex:0];
+    }
+      
+    else 
+    {
+        return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
+    }
 }
 
 -(void)playBlockTouch
@@ -152,7 +161,7 @@
 	blockLayer = [[CCLayer alloc] init];
 	[self addChild:blockLayer z:-1];
 	
-	int blockWidth = [[CCSprite spriteWithFile:[[colors objectAtIndex:1] stringByAppendingString:@"1_block0.png"]] boundingBox].size.width;
+	float blockWidth = [[CCSprite spriteWithFile:[[colors objectAtIndex:1] stringByAppendingString:@"1_block0.png"]] boundingBox].size.width;
     
     CGSize winSize = [[CCDirector sharedDirector] winSize];
 	
@@ -176,48 +185,77 @@
 	}
 }
 
--(BOOL)checkIfBlock:(Block*)b1 touches:(Block*)b2
-{    
+-(void)drawTraceLine:(NSString*)type postionX:(float)x postionY:(float)y rotation:(int)r
+{
+    CCSprite* line = [CCSprite spriteWithFile:[[@"trace_line_" stringByAppendingString:type] stringByAppendingString:@".png"]];
+    line.rotation = r;
+    line.position = ccp(x,y);
+    
+    [traceLine addObject:line];
+    [self addChild:line z:4];
+    
+}
 
-    for(int i = 1; i<= [b2 getSize]; i++)
+-(int)checkIfBlock:(Block*)b1 touches:(Block*)b2
+{    
+    double halfBlockWidth = [b1 getWidth]/2;
+    
+    float x = [b1 getPosition].x;
+    float y = [b1 getPosition].y;
+    
+    if([b1 getGridPosition] + numOfGridCols - 1 == [b2 getGridPosition])
     {
-        //top left
-        if([b1 getGridPosition] + ([b1 getSize] * numOfGridCols) - i == [b2 getGridPosition])
-            return YES;
-        
-        //bottom right
-        if([b1 getGridPosition] - (numOfGridCols * i) + [b1 getSize] == [b2 getGridPosition])
-            return YES;
-        
-        //bottom left
-        for(int j = 1; j <= [b2 getSize]; j++)
-        {
-            if([b1 getGridPosition] - (numOfGridCols * i) - j == [b2 getGridPosition])
-                return YES;
-        }
-        
+        [self drawTraceLine:@"angle" postionX:(x - halfBlockWidth) postionY:(y + halfBlockWidth) rotation:(90)];
+        return topLeft;
     }
     
-    for(int i = 0; i <= [b1 getSize]; i++)
+    else if([b1 getGridPosition] + numOfGridCols == [b2 getGridPosition])
     {
-        //right side (not corners)
-        if([b1 getGridPosition] + (numOfGridCols * i) + [b1 getSize] == [b2 getGridPosition])
-            return YES;
-        
-        //top (not left corner)
-        if([b1 getGridPosition] + (numOfGridCols * [b1 getSize]) + i == [b2 getGridPosition])
-            return YES;
-        
-        //left side (not corners)
-        if([b1 getGridPosition] + (numOfGridCols * i) - [b2 getSize] == [b2 getGridPosition])
-            return YES;
-        
-        //bottom (not corners)
-        if([b1 getGridPosition] - ([b2 getSize] * numOfGridCols) + i == [b2 getGridPosition])
-            return YES;
+        [self drawTraceLine:@"ver" postionX:x postionY:(y + halfBlockWidth) rotation:0];
+        return top;
     }
     
-    return NO;
+    else if([b1 getGridPosition] + numOfGridCols + 1 == [b2 getGridPosition])
+    {
+        [self drawTraceLine:@"angle" postionX:(x + halfBlockWidth) postionY:(y + halfBlockWidth) rotation:0];
+        return topRight;
+    }
+    
+    else if([b1 getGridPosition] + 1 == [b2 getGridPosition])
+    {
+        [self drawTraceLine:@"hor" postionX:(x + halfBlockWidth) postionY:y rotation:0];
+        return right;
+    }
+    
+    else if([b1 getGridPosition] - numOfGridCols + 1 == [b2 getGridPosition])
+    {
+        [self drawTraceLine:@"angle" postionX:(x + halfBlockWidth) postionY:(y - halfBlockWidth) rotation:(90)];
+        return bottomRight;
+    
+    }
+    else if([b1 getGridPosition] - numOfGridCols == [b2 getGridPosition])
+    {
+        [self drawTraceLine:@"ver" postionX:x postionY:(y - halfBlockWidth) rotation:0];
+        return bottom;
+    }
+    
+    else if([b1 getGridPosition] - numOfGridCols - 1 == [b2 getGridPosition])
+    {
+        [self drawTraceLine:@"angle" postionX:(x - halfBlockWidth) postionY:(y - halfBlockWidth) rotation:(0)];
+        return bottomLeft;
+    }
+    
+    else if([b1 getGridPosition] - 1 == [b2 getGridPosition])
+    {
+        [self drawTraceLine:@"hor" postionX:(x - halfBlockWidth) postionY:y rotation:0];
+        return left;
+    }
+       
+    else 
+    {
+        return doesNotTouch;
+    }
+       
 }
 
 -(void)addBlockToColCount:(Block*)b
@@ -245,11 +283,19 @@
 
 -(void)showScore:(CGPoint)touchLocation 
 {
-    score = blockCount * 10;
+    if(multiplier == 0)
+    {
+        score = blockCount * 10;
+    }
+    
+    else 
+    {
+        score = blockCount * 10 * multiplier;
+    }
     
     [scoreLabel setString:[NSString stringWithFormat:@"+%i", score]];
     
-    scoreLabel.position = ccp(touchLocation.x, touchLocation.y + 20);
+    scoreLabel.position = ccp(touchLocation.x, touchLocation.y + 40);
     scoreLabel.visible = YES;
 }
 
@@ -261,38 +307,65 @@
 	if(([touchedBlocks count] > 1) && 
 	   CGRectContainsPoint([(Block*)[touchedBlocks objectAtIndex:[touchedBlocks count]-2] calcHitArea],touchLocation))
 	{
+        if([[(Block*)[touchedBlocks lastObject] getColor] isEqualToString:@"mul"])
+        {
+            multiplier -= 5;
+            [multiplierLabel setString:[NSString stringWithFormat:@"x%i", multiplier]];
+        }
+        else 
+        {
+            blockCount--;
+            CCLOG(@"Block count %i", blockCount);
+        }
+        
         [(Block*)[touchedBlocks lastObject] swapToNormalBlock];
         [self removeBlockFromColCount:(Block*)[touchedBlocks lastObject]];
         [touchedBlocks removeLastObject];
-		blockCount--;
+        
+        [(CCSprite*)[traceLine lastObject] removeFromParentAndCleanup:YES];
+        [traceLine removeLastObject];
+        
+        if(blockCount < 3)
+        {
+            scoreLabel.visible = NO;
+        }
 		
 		return;
 	}
 	
 	for (Block* block in blocks) 
 	{
-		if([block isKindOfClass:[Block class]] && ![touchedBlocks containsObject:block] && !([[block getColor] isEqualToString:@"empty"]) )
+		if([block isKindOfClass:[Block class]] && CGRectContainsPoint([block calcHitArea], touchLocation) && ![touchedBlocks containsObject:block])
         {
-            if([touchedColor isEqualToString:@"none"] && CGRectContainsPoint([block calcHitArea], touchLocation))
+            if([[block getColor] isEqualToString:@"mul"])
+            {
+                multiplier += 5;
+                [multiplierLabel setString:[NSString stringWithFormat:@"x%i", multiplier]];
+                
+            }
+            
+            else if([touchedColor isEqualToString:@"none"])
             {
                 touchedColor = [block getColor];
                 CCLOG(@"touched: %@", block);
             }
             
-            if ([touchedColor isEqualToString:[block getColor]] && CGRectContainsPoint([block calcHitArea], touchLocation)) 
+            if ([touchedColor isEqualToString:[block getColor]] || [[block getColor] isEqualToString:@"mul"]) 
             {            
                 if([touchedBlocks count] > 0)
                 {
-                    if([self checkIfBlock:[touchedBlocks lastObject] touches:block])
+                    if([self checkIfBlock:[touchedBlocks lastObject] touches:block] != doesNotTouch)
                     {
-                        blockCount++;
+                        if(![[block getColor] isEqualToString:@"mul"])
+                        {
+                           blockCount++;
+                            CCLOG(@"Block count %i", blockCount);
+                        }
+                        
                         [block swapToDeadBlock];
                         [self playBlockTouch];
                         [touchedBlocks addObject:block];
                         [self addBlockToColCount:block];
-                        
-                        //draw touch line
-                        
                         
                     }
                     else 
@@ -304,12 +377,16 @@
                 
                 else 
                 {
-                    //CCLOG(@"First Sprite");
+                    if(![[block getColor] isEqualToString:@"mul"])
+                    {
+                        blockCount++;
+                        CCLOG(@"Block count %i", blockCount);
+                    }
+                    
                     [block swapToDeadBlock];
                     [self playBlockTouch];
                     [touchedBlocks addObject:block];
                     [self addBlockToColCount:block];
-                    blockCount++;
                 }
                 
                 break;
@@ -462,7 +539,6 @@
 	
 	touchedColor = @"none";
 	blockCount = 0;
-	score = 0;
     
 	CGPoint touchLocation = [self convertTouchToNodeSpace:touch];
 	CCLOG(@"touch location x:%f y:%f", touchLocation.x, touchLocation.y);
@@ -514,6 +590,11 @@
 	
     touchedColor = @"none";
 	blockCount = 0;
+    score = 0;
+    multiplier = 0;
+    
+    [multiplierLabel setString:@"x"];
+
     
     CCLOG(@"Number of blocks:%i", [blocks count]);
 }
@@ -522,12 +603,15 @@
 {	
     scoreLabel.visible = NO;
     
-    if(blockCount == 0)
-	{
-		CCLOG(@"blockCount is 0!!");
-		
-		return;
-	}
+    if([traceLine count] > 0)
+    {
+        for(CCSprite* line in traceLine)
+        {
+            [line removeFromParentAndCleanup:YES];
+        }
+        
+        [traceLine removeAllObjects];
+    }
 	
 	if(blockCount >= 3)
 	{
@@ -540,14 +624,11 @@
 		{
             //[block hide];
             [hideActions addObject:[CCCallFuncND actionWithTarget:self selector:@selector(hideBlock:data:) data:(Block*)block]];
-            [hideActions addObject:[CCDelayTime actionWithDuration:.05]];
+            //[hideActions addObject:[CCDelayTime actionWithDuration:.05]];
 		}
         [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(makeBlocksFall)]];
         
         [self runAction: [CCSequence actions:[self getActionSequence: hideActions],nil]];
-
-        
-		//[self makeBlocksFall];
 	}
 	
 	else 
@@ -556,7 +637,8 @@
 		{
 			[block swapToNormalBlock];
 		}
-    [self touchEndedCleanUp];
+        
+        [self touchEndedCleanUp];
 	}
 }
 
@@ -566,7 +648,27 @@
             [NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4], nil];
 }
 
--(id) init
+-(void)scheduleUpdateMethod 
+{
+    [self schedule:@selector(updateLessThanOuncePerFrame:) interval:0.1f]; 
+}
+
+-(void)updateLessThanOuncePerFrame:(ccTime)delta 
+{
+    energyBarMovement += .5;
+    
+    if(energyBar)
+    {
+        energyBar.position = ccp(energyBar.position.x + .5, energyBar.position.y);
+    }
+    
+    if(energyBarMovement == energyBar.contentSize.width/4)
+    {
+        [self unschedule:@selector(updateLessThanOuncePerFrame:)];
+    }
+}
+
+-(id)init
 {
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	if((self = [super init]))
@@ -596,25 +698,43 @@
 		touchedColor = @"none";
 		blockCount = 0;
 		totalScore = 0;
+        score = 0;
+        multiplier = 0;
 		
-		//top menu
+		//fight bar
 		CCSprite* fightBarBg = [CCSprite spriteWithFile:@"fight_bar_bg.png"];
 		fightBarBg.position = ccp(winSize.width/2, winSize.height - (fightBarBg.contentSize.height / 2));
 		[self addChild:fightBarBg z:2];
+        
+        energyBar = [CCSprite spriteWithFile:@"fight_bar_energy.png"];
+        energyBar.position = ccp(fightBarBg.position.x, fightBarBg.position.y - energyBar.contentSize.height/2 + 5);
+        [self addChild:energyBar z:1];
+        
+        energyBarMovement = 0;
 		
-		
+        CCSprite* multiIndicator = [CCSprite spriteWithFile:@"multi_indicator.png"];
+        multiIndicator.position = fightBarBg.position;
+        [self addChild:multiIndicator z:3];
+        
+        multiplierLabel = [CCLabelBMFont labelWithString:@"x" fntFile:@"smallNumbers.fnt"];
+        multiplierLabel.position = ccp(multiIndicator.position.x, multiIndicator.position.y - multiplierLabel.contentSize.height/4);
+        [self addChild:multiplierLabel z:4];
+        
+        
 		totalScoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"largeNumbers.fnt"];
-        totalScoreLabel.position = ccp(winSize.width/2, winSize.height - totalScoreLabel.contentSize.height);
+        totalScoreLabel.position = ccp(winSize.width/2, fightBarBg.position.y + totalScoreLabel.contentSize.height);
         [self addChild:totalScoreLabel z:3];
-		//end top menu
+		//end fight bar
         
         scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"smallNumbers.fnt"];
         scoreLabel.visible = NO;
-        [self  addChild:scoreLabel z:3];
+        [self  addChild:scoreLabel z:10];
 		
 		blocks = [[NSMutableArray alloc] initWithCapacity:(numOfGridCols*numOfGridRows)];
 		touchedBlocks = [[NSMutableArray alloc] init];
         touchedBlockColumns = [[NSMutableArray alloc] init];
+        
+        traceLine = [[NSMutableArray alloc] init];
         
         for(int j = 0; j < numOfGridCols; j++)
         {
@@ -626,6 +746,7 @@
         [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
 		
 		[self createAndDisplayGrid];
+        [self scheduleUpdateMethod];
 	}
 	return self;
 }

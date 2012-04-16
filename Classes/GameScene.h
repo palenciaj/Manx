@@ -21,13 +21,33 @@
 	NSMutableArray* touchedBlocks;
     NSMutableArray* touchedBlockColumns;
     
+    NSMutableArray* traceLine;
+    
     int totalScore;
     int score;
+    int multiplier;
+    
+    CCSprite* energyBar;
+    float energyBarMovement;
     
     CCLabelBMFont* totalScoreLabel;
+    CCLabelBMFont* multiplierLabel;
     CCLabelBMFont* scoreLabel;
     
     NSArray* test;
+    
+    enum blockPosition
+    {
+        doesNotTouch = 0,
+        topLeft = 1, 
+        top = 2, 
+        topRight = 3, 
+        right = 4, 
+        bottomRight = 5, 
+        bottom = 6, 
+        bottomLeft = 7, 
+        left = 8
+    };
 }
 
 @property int numOfGridRows;
