@@ -22,16 +22,16 @@
 	{
 		//CCLOG(@"%@: %@ Position: %f, %f GridPos: %i", NSStringFromSelector(_cmd), self, x, y, g);
 		
-		myParent = [[CCNode alloc] init];
-		myParent = parentNode;
-		
 		myColor = [[NSString alloc] initWithString:color];
 		mySize = s;
         myGridPosition = g;
+        isPartOfCluster = NO;
         
         myActions = [[NSMutableArray alloc] init];
         
-        mySprite = [CCSprite spriteWithFile:[myColor stringByAppendingString:@"_block0.png"]];
+        spriteType = 1;
+        
+        mySprite = [CCSprite spriteWithFile:[self normalTexture]];
         
 		
         //mySprite.anchorPoint = ccp(0,0);
@@ -41,6 +41,11 @@
 	}
 	
 	return self;
+}
+
+-(NSString*)normalTexture
+{
+    return [myColor stringByAppendingString:[NSString stringWithFormat:@"1_tile%i.png", spriteType]];
 }
 
 -(CGRect)calcHitArea
@@ -83,7 +88,10 @@
 -(void)runActions
 {
 	if([myActions count] > 0)
+    {
         [mySprite runAction: [CCSequence actions:[self getActionSequence: myActions],nil]];
+        isPartOfCluster = NO;
+    }
     
     [myActions removeAllObjects];
 }
@@ -92,30 +100,15 @@
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 
-    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_dead_block0.png"]]];
+    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_dead_tile.png"]]];
     
 }
 
 -(void)swapToNormalBlock
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_block0.png"]]];
+	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[self normalTexture]]];
 }
-/*
--(void)showScore:(int)score
-{
-    scoreLabel = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"+%i",score] fntFile:@"smallNumbers.fnt"];
-    
-    scoreLabel.position = CGPointMake(mySprite.position.x, mySprite.position.y + mySprite.contentSize.height/2);
-    
-    [myParent addChild:scoreLabel z:1];
-}
-
--(void)removeScore
-{
-    [scoreLabel removeFromParentAndCleanup:YES];
-}
-*/
 
 -(CCSprite*)getSprite
 {
@@ -125,6 +118,16 @@
 -(CGPoint)getPosition
 {
     return mySprite.position;
+}
+
+-(BOOL)isPartOfCluster
+{
+    return isPartOfCluster;
+}
+
+-(void)setClusterStatus:(BOOL)c
+{
+    isPartOfCluster = c;
 }
 
 -(void)setPosition:(CGPoint)position
@@ -152,6 +155,11 @@
     myGridPosition = g;
 }
 
+-(BOOL)getClusterStatus
+{
+    return isPartOfCluster;
+}
+
 -(NSString*)getColor
 {
 	return myColor;
@@ -162,7 +170,7 @@
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 
 	myColor = color; //needs to be mutable?
-	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"%i_block0.png"]]];
+	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[self normalTexture]]];
 }
 
 -(void)hide
@@ -188,7 +196,6 @@
 	
 	[mySprite release];
 	[myColor release];
-	[myParent release];
 	
 	// Must manually remove this class as touch input receiver!
 	//[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];

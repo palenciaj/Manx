@@ -8,6 +8,7 @@
 
 #import "GameScene.h"
 #import "Block.h"
+#import "Outline.h"
 
 #import "SimpleAudioEngine.h"
 
@@ -30,11 +31,12 @@
 	
 	colors = [[NSArray alloc] initWithObjects:
 			  @"mul", 
-			  @"red",
+			  @"blu",
 			  @"prp", 
 			  @"grn", 
-			  @"blu", nil];
+			  @"red", nil];
 }
+
 /*
 - (void) drawRect:(CGRect) rect
 {
@@ -52,9 +54,16 @@
 
 -(void) draw
 {
-	for (Block *block in blocks) 
+	
+    for (Block *block in blocks) 
 	{
 		CGRect hitArea = [block calcHitArea];		
+		[self drawRect:hitArea];
+	}
+    
+    for (Outline* outline in outlines) 
+	{
+		CGRect hitArea = [outline calcHitArea];		
 		[self drawRect:hitArea];
 	}
 }
@@ -65,15 +74,19 @@
 	#define NUM_OF_BLOCK_COLORS 4
     
     //make 10% change of getting mult. block
+    /*
     if(((arc4random() % 100)) < 7)
     {
         return [colors objectAtIndex:0];
     }
-      
+    
     else 
     {
         return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
     }
+     */
+    
+    return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
 }
 
 -(void)playBlockTouch
@@ -92,7 +105,7 @@
     
     for(int i = 0; i < count; i++)
     {
-       if([[blocks objectAtIndex:i] isKindOfClass:[Block class]])
+       if([[blocks objectAtIndex:i] isKindOfClass:[Block class]] && ![[blocks objectAtIndex:i] isPartOfCluster])
        {        
            // i % num of grid cols will give you COLUMN  it is in
            // i / num of grid cols will give you the ROW it is in
@@ -108,24 +121,41 @@
            {
                NSString* color = [(Block*)[blocks objectAtIndex:i] getColor];
                
+               NSMutableArray* blocksToCheck = [[NSMutableArray alloc] init];
                
-               if(![color isEqualToString:@"empty"] && ![color isEqualToString:@"space"])
+               [blocksToCheck addObject:[blocks objectAtIndex:(i+1)]]; //check block to the right
+               [blocksToCheck addObject:[blocks objectAtIndex:(i+numOfGridCols)]]; //check block to the top
+               [blocksToCheck addObject:[blocks objectAtIndex:(i+numOfGridCols+1)]]; //check the block to the top right
+               
+               BOOL cluster = YES;
+               
+               for(Block* block in blocksToCheck)
                {
-                   //check block to the right
-                   if([[blocks objectAtIndex:(i+1)] isKindOfClass:[Block class]] && color == [(Block*)[blocks objectAtIndex:(i+1)] getColor])
+                   if(![color isEqualToString:[block getColor]] || [block isPartOfCluster])
                    {
-                       //check block to the top
-                       if([[blocks objectAtIndex:(i+numOfGridCols)] isKindOfClass:[Block class]]  && color == [(Block*)[blocks objectAtIndex:(i+numOfGridCols)] getColor])
-                       {
-                           //check the block to the top right
-                           if([[blocks objectAtIndex:(i+numOfGridCols+1)] isKindOfClass:[Block class]] && color == [(Block*)[blocks objectAtIndex:(i+numOfGridCols+1)] getColor])
-                           {
-                               CCLOG(@"2x2 Detected!! At %i, %i", col, row);
-                               
-                           }
-                       }
+                       cluster = NO;
                    }
                }
+               
+               if(cluster)
+               {
+                   double blockWidth = [(Block*)[blocks objectAtIndex:i] getWidth];
+                   
+                   CCLOG(@"2x2 Detected!! At %i, %i", col, row);
+                   
+                   float x = offSet + (col + 1) * blockWidth;
+                   float y = (row + 1) * blockWidth;
+                   Outline* outline2x2 = [Outline outlineWithParentNode:self atPositionX:x atPositionY:y withSize:2];
+                   
+                   
+                   for(Block* block in blocksToCheck)
+                   {
+                       [block setClusterStatus:YES];
+                   }
+                   
+                   [outlines addObject:outline2x2];
+               }
+            
            }
        }
     }
@@ -183,6 +213,8 @@
         
 		y += blockWidth;
 	}
+    
+    [self detectBlockClusters];
 }
 
 -(void)drawTraceLine:(NSString*)type postionX:(float)x postionY:(float)y rotation:(int)r
@@ -315,7 +347,10 @@
         else 
         {
             blockCount--;
-            CCLOG(@"Block count %i", blockCount);
+            if(blockCount == 0)
+            {
+                touchedColor = @"none";
+            }
         }
         
         [(Block*)[touchedBlocks lastObject] swapToNormalBlock];
@@ -359,7 +394,7 @@
                         if(![[block getColor] isEqualToString:@"mul"])
                         {
                            blockCount++;
-                            CCLOG(@"Block count %i", blockCount);
+                            //CCLOG(@"Block count %i", blockCount);
                         }
                         
                         [block swapToDeadBlock];
@@ -530,6 +565,15 @@
     [movedBlocks removeAllObjects];
     
     [self touchEndedCleanUp];
+    
+    for(Outline* outline in outlines)
+    {
+        [outline remove];
+    }
+    
+    [outlines removeAllObjects];
+    
+    [self detectBlockClusters];
 }
 
 
@@ -664,7 +708,8 @@
     
     if(energyBarMovement == energyBar.contentSize.width/4)
     {
-        [self unschedule:@selector(updateLessThanOuncePerFrame:)];
+        energyBar.position = ccp(fightBarBg.position.x, fightBarBg.position.y - energyBar.contentSize.height/2 + 5);
+        energyBarMovement = 0;
     }
 }
 
@@ -702,7 +747,7 @@
         multiplier = 0;
 		
 		//fight bar
-		CCSprite* fightBarBg = [CCSprite spriteWithFile:@"fight_bar_bg.png"];
+        fightBarBg = [CCSprite spriteWithFile:@"fight_bar_bg.png"];
 		fightBarBg.position = ccp(winSize.width/2, winSize.height - (fightBarBg.contentSize.height / 2));
 		[self addChild:fightBarBg z:2];
         
@@ -735,6 +780,7 @@
         touchedBlockColumns = [[NSMutableArray alloc] init];
         
         traceLine = [[NSMutableArray alloc] init];
+        outlines = [[NSMutableArray alloc] init];
         
         for(int j = 0; j < numOfGridCols; j++)
         {

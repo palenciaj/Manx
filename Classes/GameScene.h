@@ -22,11 +22,13 @@
     NSMutableArray* touchedBlockColumns;
     
     NSMutableArray* traceLine;
+    NSMutableArray* outlines;
     
     int totalScore;
     int score;
     int multiplier;
     
+    CCSprite* fightBarBg;
     CCSprite* energyBar;
     float energyBarMovement;
     

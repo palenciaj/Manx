@@ -16,11 +16,13 @@
 	int mySize;
     int myGridPosition;
     
+    int spriteType;
+    
+    BOOL isPartOfCluster;
+    
     CCLabelBMFont* scoreLabel;
     
     NSMutableArray* myActions;
-	
-	CCNode* myParent;
 }
 
 +(id) blockWithParentNode:(CCNode*)parentNode withColor:(NSString*)color atPositionX:(float)x atPositionY:(float)y atGridPosition:(int)g withSize:(int)s;
@@ -42,6 +44,9 @@
 -(void)setColor:(NSString*)color;
 
 -(CCSprite*)getSprite;
+
+-(BOOL)isPartOfCluster;
+-(void)setClusterStatus:(BOOL)c;
 
 -(CGRect)calcHitArea;
 
