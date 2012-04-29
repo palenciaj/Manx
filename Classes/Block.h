@@ -16,6 +16,8 @@
 	int mySize;
     int myGridPosition;
     
+    int myFrames;
+    
     int spriteType;
     
     BOOL isPartOfCluster;

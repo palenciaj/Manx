@@ -71,7 +71,7 @@
 
 -(NSString*) pickBlockColor
 {
-	#define NUM_OF_BLOCK_COLORS 4
+	#define NUM_OF_BLOCK_COLORS 3
     
     //make 10% change of getting mult. block
     /*
@@ -722,6 +722,9 @@
 		
 		numOfGridRows = 9;
 		numOfGridCols = 7;
+        
+        CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache]; 
+        [frameCache addSpriteFramesWithFile:@"tiles.plist"];
 		
 		//init layers
 		blockLayer = [[CCLayer alloc] init];

@@ -20,20 +20,30 @@
 {
 	if ((self = [super init]))
 	{
-		//CCLOG(@"%@: %@ Position: %f, %f GridPos: %i", NSStringFromSelector(_cmd), self, x, y, g);
+		CCLOG(@"%@: %@ Position: %f, %f GridPos: %i, Color: %@", NSStringFromSelector(_cmd), self, x, y, g, color);
 		
 		myColor = [[NSString alloc] initWithString:color];
 		mySize = s;
         myGridPosition = g;
         isPartOfCluster = NO;
         
+        if([myColor isEqualToString:@"grn"])
+        {
+            myFrames = 8;
+        }
+        
+        else
+        {
+            myFrames = 6;
+        }
+        
         myActions = [[NSMutableArray alloc] init];
         
         spriteType = 1;
         
-        mySprite = [CCSprite spriteWithFile:[self normalTexture]];
-        
-		
+        mySprite = [CCSprite spriteWithSpriteFrameName:[self normalTexture]];
+        [self animate];
+
         //mySprite.anchorPoint = ccp(0,0);
 		mySprite.position = ccp(x,y);
 		[parentNode addChild:mySprite z:-2];
@@ -41,6 +51,30 @@
 	}
 	
 	return self;
+}
+
+-(void)animate
+{
+    CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache];
+    
+    NSMutableArray* frames = [NSMutableArray arrayWithCapacity:myFrames];
+   
+    for (int i = 1; i <= myFrames; i++) 
+    {
+        NSString* file = [myColor stringByAppendingString:[NSString stringWithFormat:@"1_tile%i.png", i]];
+        
+        CCLOG(@"file: %@", file);
+        
+        CCSpriteFrame* frame = [frameCache spriteFrameByName:file];
+        [frames addObject:frame];
+    }
+    
+    CCAnimation* animation = [CCAnimation animationWithFrames:frames delay:.2];
+    
+    CCAnimate* animate = [CCAnimate actionWithAnimation:animation];
+    CCRepeatForever* repeat = [CCRepeatForever actionWithAction:animate];
+    [mySprite runAction:repeat];
+    
 }
 
 -(NSString*)normalTexture
@@ -99,15 +133,18 @@
 -(void)swapToDeadBlock
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-
-    [mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_dead_tile.png"]]];
+    [mySprite stopAllActions];
+    [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[NSString stringWithFormat:@"tile_%@_touch.png", myColor]]];
+    //[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_dead_tile.png"]]];
     
 }
 
 -(void)swapToNormalBlock
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-	[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[self normalTexture]]];
+    
+	[self animate];
+    //[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[self normalTexture]]];
 }
 
 -(CCSprite*)getSprite
