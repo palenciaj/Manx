@@ -30,7 +30,7 @@
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	
 	colors = [[NSArray alloc] initWithObjects:
-			  @"mul", 
+			  @"nmy", 
 			  @"blu",
 			  @"prp", 
 			  @"grn", 
@@ -69,22 +69,24 @@
 }
 */
 
--(NSString*) pickBlockColor
+-(NSString*) pickBlockColor:(bool)b
 {
-	#define NUM_OF_BLOCK_COLORS 3
+	#define NUM_OF_BLOCK_COLORS 4
     
     //make 10% change of getting mult. block
-    /*
-    if(((arc4random() % 100)) < 7)
-    {
-        return [colors objectAtIndex:0];
-    }
     
-    else 
+    if(b)
     {
-        return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
+        if(((arc4random() % 100)) < 5)
+        {
+            return [colors objectAtIndex:0];
+        }
+        
+        else 
+        {
+            return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
+        }
     }
-     */
     
     return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
 }
@@ -146,6 +148,7 @@
                    float x = offSet + (col + 1) * blockWidth;
                    float y = (row + 1) * blockWidth;
                    Outline* outline2x2 = [Outline outlineWithParentNode:self atPositionX:x atPositionY:y withSize:2];
+                   [outline2x2 setBLocks:blocksToCheck];
                    
                    
                    for(Block* block in blocksToCheck)
@@ -161,14 +164,14 @@
     }
 }
 
--(void)addNewBlockAtPositionX:(float)x positionY:(float)y withSize:(int)s
+-(void)addNewBlockAtPositionX:(float)x positionY:(float)y withSize:(int)s withSpike:(bool)b
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	
 	
     Block* myBlock = [self createNewBlockAtPositionX:x 
                                            positionY:y 
-                                           withColor:[self pickBlockColor] 
+                                           withColor:[self pickBlockColor:b] 
                                       atGridPosition:[blocks count] 
                                             withSize:s];
     /*
@@ -206,7 +209,16 @@
 		
 		for(int j = 0; j < numOfGridCols; j++)
 		{
-			[self addNewBlockAtPositionX:x positionY:y withSize:1];
+			if(i == 0)
+            {
+                [self addNewBlockAtPositionX:x positionY:y withSize:1 withSpike:NO];
+            }
+            
+            else 
+            {
+                [self addNewBlockAtPositionX:x positionY:y withSize:1 withSpike:YES];
+            }
+            
             
 			x += blockWidth;
 		}
@@ -214,7 +226,7 @@
 		y += blockWidth;
 	}
     
-    [self detectBlockClusters];
+    //[self detectBlockClusters];
 }
 
 -(void)drawTraceLine:(NSString*)type postionX:(float)x postionY:(float)y rotation:(int)r
@@ -370,7 +382,7 @@
 	
 	for (Block* block in blocks) 
 	{
-		if([block isKindOfClass:[Block class]] && CGRectContainsPoint([block calcHitArea], touchLocation) && ![touchedBlocks containsObject:block])
+		if([block isKindOfClass:[Block class]] && ![[block getColor] isEqualToString:@"nmy"] && CGRectContainsPoint([block calcHitArea], touchLocation) && ![touchedBlocks containsObject:block])
         {
             if([[block getColor] isEqualToString:@"mul"])
             {
@@ -540,7 +552,7 @@
             //add to appropriate grid position
             [movedBlocks addObject:[self createNewBlockAtPositionX:x 
                                                          positionY:y 
-                                                         withColor:[self pickBlockColor]
+                                                         withColor:[self pickBlockColor:YES]
                                                     atGridPosition:gp 
                                                           withSize:1]];
             
@@ -573,7 +585,7 @@
     
     [outlines removeAllObjects];
     
-    [self detectBlockClusters];
+    //[self detectBlockClusters];
 }
 
 
@@ -614,6 +626,23 @@
 		}
 	}
 	return seq;
+}
+
+-(void)removeSpikeTilesAtBottom
+{
+    for(int i = 0; i < numOfGridCols; i++)
+    {
+        if([[(Block*)[blocks objectAtIndex:i] getColor] isEqualToString:@"nmy"])
+        {
+            [[blocks objectAtIndex:i] hide];
+            [touchedBlocks addObject:[blocks objectAtIndex:i]];
+        }
+    }
+    
+    if([touchedBlocks count] > 0)
+    {
+        [self makeBlocksFall];
+    }
 }
 
 
@@ -671,6 +700,8 @@
             //[hideActions addObject:[CCDelayTime actionWithDuration:.05]];
 		}
         [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(makeBlocksFall)]];
+        [hideActions addObject:[CCDelayTime actionWithDuration:.3]];
+        [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(removeSpikeTilesAtBottom)]];
         
         [self runAction: [CCSequence actions:[self getActionSequence: hideActions],nil]];
 	}
@@ -724,7 +755,8 @@
 		numOfGridCols = 7;
         
         CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache]; 
-        [frameCache addSpriteFramesWithFile:@"tiles.plist"];
+        
+        [frameCache addSpriteFramesWithFile:@"FightbarUI.plist"];
 		
 		//init layers
 		blockLayer = [[CCLayer alloc] init];
@@ -750,10 +782,18 @@
         multiplier = 0;
 		
 		//fight bar
-        fightBarBg = [CCSprite spriteWithFile:@"fight_bar_bg.png"];
+        
+        CCSprite* gradiant = [CCSprite spriteWithSpriteFrameName:@"top_gradiant.png"];
+        gradiant.position = ccp(winSize.width/2, winSize.height - (gradiant.contentSize.height / 2));
+        [self addChild:gradiant z:1];
+        
+        
+        fightBarBg = [CCSprite spriteWithSpriteFrameName:@"fight_bar.png"];
 		fightBarBg.position = ccp(winSize.width/2, winSize.height - (fightBarBg.contentSize.height / 2));
 		[self addChild:fightBarBg z:2];
         
+        
+        /*
         energyBar = [CCSprite spriteWithFile:@"fight_bar_energy.png"];
         energyBar.position = ccp(fightBarBg.position.x, fightBarBg.position.y - energyBar.contentSize.height/2 + 5);
         [self addChild:energyBar z:1];
@@ -767,10 +807,10 @@
         multiplierLabel = [CCLabelBMFont labelWithString:@"x" fntFile:@"smallNumbers.fnt"];
         multiplierLabel.position = ccp(multiIndicator.position.x, multiIndicator.position.y - multiplierLabel.contentSize.height/4);
         [self addChild:multiplierLabel z:4];
+        */
         
-        
-		totalScoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"largeNumbers.fnt"];
-        totalScoreLabel.position = ccp(winSize.width/2, fightBarBg.position.y + totalScoreLabel.contentSize.height);
+		totalScoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"Score.fnt"];
+        totalScoreLabel.position = ccp(winSize.width/2, fightBarBg.position.y + totalScoreLabel.contentSize.height/2);
         [self addChild:totalScoreLabel z:3];
 		//end fight bar
         
@@ -794,8 +834,9 @@
         
         [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
 		
+        [frameCache addSpriteFramesWithFile:@"Tiles.plist"];
 		[self createAndDisplayGrid];
-        [self scheduleUpdateMethod];
+        //[self scheduleUpdateMethod];
 	}
 	return self;
 }

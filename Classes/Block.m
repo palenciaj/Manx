@@ -27,19 +27,39 @@
         myGridPosition = g;
         isPartOfCluster = NO;
         
+        myActions = [[NSMutableArray alloc] init];
+        
+        spriteType = 1;
+        
         if([myColor isEqualToString:@"grn"])
         {
             myFrames = 8;
         }
         
-        else
+        else if([myColor isEqualToString:@"blu"])
+        {
+            myFrames = 15;
+        }
+        
+        else if([myColor isEqualToString:@"prp"])
         {
             myFrames = 6;
         }
         
-        myActions = [[NSMutableArray alloc] init];
+        else if([myColor isEqualToString:@"red"])
+        {
+            myFrames = 6;
+        }
         
-        spriteType = 1;
+        else if([myColor isEqualToString:@"nmy"])
+        {
+            myFrames = 6;
+        }
+        
+        else
+        {
+            myFrames = 1;
+        }
         
         mySprite = [CCSprite spriteWithSpriteFrameName:[self normalTexture]];
         [self animate];
@@ -58,18 +78,22 @@
     CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache];
     
     NSMutableArray* frames = [NSMutableArray arrayWithCapacity:myFrames];
+    
+    int r = ((arc4random() % myFrames) + 1);
    
-    for (int i = 1; i <= myFrames; i++) 
+    
+    for (int i = r; i <= myFrames +r; i++) 
     {
-        NSString* file = [myColor stringByAppendingString:[NSString stringWithFormat:@"1_tile%i.png", i]];
+        NSString* file = [myColor stringByAppendingString:[NSString stringWithFormat:@"1_tile%i.png", (i%myFrames)+1]];
         
-        CCLOG(@"file: %@", file);
+        //CCLOG(@"file: %@", file);
         
         CCSpriteFrame* frame = [frameCache spriteFrameByName:file];
         [frames addObject:frame];
     }
+     
     
-    CCAnimation* animation = [CCAnimation animationWithFrames:frames delay:.2];
+    CCAnimation* animation = [CCAnimation animationWithFrames:frames delay:.17];
     
     CCAnimate* animate = [CCAnimate actionWithAnimation:animation];
     CCRepeatForever* repeat = [CCRepeatForever actionWithAction:animate];

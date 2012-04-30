@@ -34,6 +34,11 @@
 	return self;
 }
 
+-(void)setBLocks:(NSMutableArray*)array
+{
+    myBlocks = array;
+}
+
 -(NSMutableArray*)getBlocks
 {
     return myBlocks;
@@ -58,15 +63,17 @@
 -(void)remove
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-	
 	[mySprite removeFromParentAndCleanup:YES];
+    [myBlocks removeAllObjects];
 }
 
 - (void)dealloc 
 {
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
     
-	[mySprite release];
+	//[mySprite release];
+    [mySprite removeFromParentAndCleanup:YES];
+    [myBlocks removeAllObjects];
     [myBlocks release];
 	
 	// Must manually remove this class as touch input receiver!

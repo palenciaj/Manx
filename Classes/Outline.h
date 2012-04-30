@@ -20,6 +20,7 @@
 -(id) initWithParentNode:(CCNode*)parentNode atPositionX:(float)x atPositionY:(float)y  withSize:(int)s;
 
 -(NSMutableArray*)getBlocks;
+-(void)setBLocks:(NSMutableArray*)array;
 -(CGRect)calcHitArea;
 
 -(void)remove;
