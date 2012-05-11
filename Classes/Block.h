@@ -22,6 +22,10 @@
     
     BOOL isPartOfCluster;
     
+    int fall;
+    
+    int animateTag;
+    
     CCLabelBMFont* scoreLabel;
     
     NSMutableArray* myActions;

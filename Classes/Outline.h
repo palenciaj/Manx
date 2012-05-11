@@ -13,14 +13,23 @@
     CCSprite* mySprite;
     int mySize;
     
+    BOOL touched;
+    
+    NSMutableArray* myBlockGridPos;
     NSMutableArray* myBlocks;
 }
 
 +(id) outlineWithParentNode:(CCNode*)parentNode atPositionX:(float)x atPositionY:(float)y withSize:(int)s;
 -(id) initWithParentNode:(CCNode*)parentNode atPositionX:(float)x atPositionY:(float)y  withSize:(int)s;
 
+-(void)setTouched:(BOOL)b;
+-(BOOL)getTouched;
+
+-(void)hide;
+
 -(NSMutableArray*)getBlocks;
--(void)setBLocks:(NSMutableArray*)array;
+-(void)setBlocks:(NSMutableArray*)array;
+-(NSMutableArray*)getBlockGridPos;
 -(CGRect)calcHitArea;
 
 -(void)remove;

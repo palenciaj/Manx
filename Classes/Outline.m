@@ -7,6 +7,7 @@
 //
 
 #import "Outline.h"
+#import "BLock.h"
 
 @implementation Outline
 
@@ -22,6 +23,7 @@
 		mySize = s;
         
         myBlocks = [[NSMutableArray alloc] init];
+        myBlockGridPos = [[NSMutableArray alloc] init];
         
         mySprite = [CCSprite spriteWithFile:[NSString stringWithFormat:@"outline%i.png", mySize]];
         
@@ -34,14 +36,39 @@
 	return self;
 }
 
--(void)setBLocks:(NSMutableArray*)array
+-(void)hide
+{
+    mySprite.visible = NO;
+}
+
+-(void)setTouched:(BOOL)b
+{
+    touched = b;
+}
+
+-(BOOL)getTouched
+{
+    return touched;
+}
+
+-(void)setBlocks:(NSMutableArray*)array
 {
     myBlocks = array;
+    
+    for(Block* block in myBlocks)
+    {
+        [myBlockGridPos addObject:[NSNumber numberWithInt:[block getGridPosition]]];
+    }
 }
 
 -(NSMutableArray*)getBlocks
 {
     return myBlocks;
+}
+
+-(NSMutableArray*)getBlockGridPos
+{
+    return myBlockGridPos;
 }
 
 -(CGRect)calcHitArea
@@ -65,6 +92,7 @@
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	[mySprite removeFromParentAndCleanup:YES];
     [myBlocks removeAllObjects];
+    [myBlockGridPos removeAllObjects];
 }
 
 - (void)dealloc 
@@ -75,6 +103,7 @@
     [mySprite removeFromParentAndCleanup:YES];
     [myBlocks removeAllObjects];
     [myBlocks release];
+    [myBlockGridPos release];
 	
 	// Must manually remove this class as touch input receiver!
 	//[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];

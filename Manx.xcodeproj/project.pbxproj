@@ -14,8 +14,8 @@
 		3715AE1C152FABC70080EACD /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 3715ADEA152FABC60080EACD /* Default.png */; };
 		3715AE1D152FABC70080EACD /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3715ADEB152FABC60080EACD /* Default@2x.png */; };
 		3715AE1E152FABC70080EACD /* fps_images.png in Resources */ = {isa = PBXBuildFile; fileRef = 3715ADEC152FABC60080EACD /* fps_images.png */; };
-		3715AE1F152FABC70080EACD /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3715ADED152FABC60080EACD /* icon@2x.png */; };
 		3715AE21152FABC70080EACD /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = 3715ADEF152FABC60080EACD /* iTunesArtwork */; };
+		372B268E15520B80006E6BA0 /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 372B268D15520B80006E6BA0 /* icon@2x.png */; };
 		37340CFB154E17A2009C22CA /* FightbarUI-hd.plist in Resources */ = {isa = PBXBuildFile; fileRef = 37340CF7154E17A2009C22CA /* FightbarUI-hd.plist */; };
 		37340CFC154E17A2009C22CA /* FightbarUI-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 37340CF8154E17A2009C22CA /* FightbarUI-hd.png */; };
 		37340CFD154E17A2009C22CA /* FightbarUI.plist in Resources */ = {isa = PBXBuildFile; fileRef = 37340CF9154E17A2009C22CA /* FightbarUI.plist */; };
@@ -31,17 +31,11 @@
 		3764044B1537F21C0029EDD7 /* trace_line_ver.png in Resources */ = {isa = PBXBuildFile; fileRef = 376404451537F21C0029EDD7 /* trace_line_ver.png */; };
 		37640488153BE5670029EDD7 /* outline_2x2-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 37640486153BE5670029EDD7 /* outline_2x2-hd.png */; };
 		37640489153BE5670029EDD7 /* outline_2x2.png in Resources */ = {isa = PBXBuildFile; fileRef = 37640487153BE5670029EDD7 /* outline_2x2.png */; };
+		37986E71155A0F910061ACD2 /* pause_button-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 37986E6F155A0F910061ACD2 /* pause_button-hd.png */; };
+		37986E72155A0F910061ACD2 /* pause_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 37986E70155A0F910061ACD2 /* pause_button.png */; };
 		37A07BF915489D0400EFFE71 /* outline2-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 37A07BF715489D0400EFFE71 /* outline2-hd.png */; };
 		37A07BFA15489D0400EFFE71 /* outline2.png in Resources */ = {isa = PBXBuildFile; fileRef = 37A07BF815489D0400EFFE71 /* outline2.png */; };
 		37AACA811533BD38008EB2FE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 37AACA801533BD38008EB2FE /* icon.png */; };
-		37AACAAE1533CEBC008EB2FE /* largeNumbers-hd.fnt in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAA61533CEBC008EB2FE /* largeNumbers-hd.fnt */; };
-		37AACAAF1533CEBC008EB2FE /* largeNumbers-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAA71533CEBC008EB2FE /* largeNumbers-hd.png */; };
-		37AACAB01533CEBC008EB2FE /* largeNumbers.fnt in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAA81533CEBC008EB2FE /* largeNumbers.fnt */; };
-		37AACAB11533CEBC008EB2FE /* largeNumbers.png in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAA91533CEBC008EB2FE /* largeNumbers.png */; };
-		37AACABA1533CEF7008EB2FE /* smallNumbers-hd.fnt in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAB61533CEF7008EB2FE /* smallNumbers-hd.fnt */; };
-		37AACABB1533CEF7008EB2FE /* smallNumbers-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAB71533CEF7008EB2FE /* smallNumbers-hd.png */; };
-		37AACABC1533CEF7008EB2FE /* smallNumbers.fnt in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAB81533CEF7008EB2FE /* smallNumbers.fnt */; };
-		37AACABD1533CEF7008EB2FE /* smallNumbers.png in Resources */ = {isa = PBXBuildFile; fileRef = 37AACAB91533CEF7008EB2FE /* smallNumbers.png */; };
 		37AACACC15349750008EB2FE /* Block_touch.caf in Resources */ = {isa = PBXBuildFile; fileRef = 37AACACB15349750008EB2FE /* Block_touch.caf */; };
 		37B698A6154E3B5100534E21 /* Tiles-hd.plist in Resources */ = {isa = PBXBuildFile; fileRef = 37B698A4154E3B5100534E21 /* Tiles-hd.plist */; };
 		37B698A7154E3B5100534E21 /* Tiles-hd.png in Resources */ = {isa = PBXBuildFile; fileRef = 37B698A5154E3B5100534E21 /* Tiles-hd.png */; };
@@ -293,9 +287,9 @@
 		3715ADEA152FABC60080EACD /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		3715ADEB152FABC60080EACD /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		3715ADEC152FABC60080EACD /* fps_images.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fps_images.png; sourceTree = "<group>"; };
-		3715ADED152FABC60080EACD /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
 		3715ADEE152FABC60080EACD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3715ADEF152FABC60080EACD /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; path = iTunesArtwork; sourceTree = "<group>"; };
+		372B268D15520B80006E6BA0 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon@2x.png"; path = "../icon@2x.png"; sourceTree = "<group>"; };
 		37340CF7154E17A2009C22CA /* FightbarUI-hd.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "FightbarUI-hd.plist"; sourceTree = "<group>"; };
 		37340CF8154E17A2009C22CA /* FightbarUI-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "FightbarUI-hd.png"; sourceTree = "<group>"; };
 		37340CF9154E17A2009C22CA /* FightbarUI.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = FightbarUI.plist; sourceTree = "<group>"; };
@@ -312,17 +306,11 @@
 		376404451537F21C0029EDD7 /* trace_line_ver.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trace_line_ver.png; sourceTree = "<group>"; };
 		37640486153BE5670029EDD7 /* outline_2x2-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "outline_2x2-hd.png"; sourceTree = "<group>"; };
 		37640487153BE5670029EDD7 /* outline_2x2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = outline_2x2.png; sourceTree = "<group>"; };
+		37986E6F155A0F910061ACD2 /* pause_button-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pause_button-hd.png"; sourceTree = "<group>"; };
+		37986E70155A0F910061ACD2 /* pause_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause_button.png; sourceTree = "<group>"; };
 		37A07BF715489D0400EFFE71 /* outline2-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "outline2-hd.png"; sourceTree = "<group>"; };
 		37A07BF815489D0400EFFE71 /* outline2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = outline2.png; sourceTree = "<group>"; };
 		37AACA801533BD38008EB2FE /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
-		37AACAA61533CEBC008EB2FE /* largeNumbers-hd.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "largeNumbers-hd.fnt"; sourceTree = "<group>"; };
-		37AACAA71533CEBC008EB2FE /* largeNumbers-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "largeNumbers-hd.png"; sourceTree = "<group>"; };
-		37AACAA81533CEBC008EB2FE /* largeNumbers.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = largeNumbers.fnt; sourceTree = "<group>"; };
-		37AACAA91533CEBC008EB2FE /* largeNumbers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = largeNumbers.png; sourceTree = "<group>"; };
-		37AACAB61533CEF7008EB2FE /* smallNumbers-hd.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "smallNumbers-hd.fnt"; sourceTree = "<group>"; };
-		37AACAB71533CEF7008EB2FE /* smallNumbers-hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "smallNumbers-hd.png"; sourceTree = "<group>"; };
-		37AACAB81533CEF7008EB2FE /* smallNumbers.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = smallNumbers.fnt; sourceTree = "<group>"; };
-		37AACAB91533CEF7008EB2FE /* smallNumbers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = smallNumbers.png; sourceTree = "<group>"; };
 		37AACACB15349750008EB2FE /* Block_touch.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Block_touch.caf; sourceTree = "<group>"; };
 		37B5D339150951C100E77AD5 /* Manx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Manx.entitlements; sourceTree = "<group>"; };
 		37B698A4154E3B5100534E21 /* Tiles-hd.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Tiles-hd.plist"; sourceTree = "<group>"; };
@@ -701,14 +689,6 @@
 				37B698A9154E3ECB00534E21 /* Score-hd.png */,
 				37B698AA154E3ECB00534E21 /* Score.fnt */,
 				37B698AB154E3ECB00534E21 /* Score.png */,
-				37AACAB61533CEF7008EB2FE /* smallNumbers-hd.fnt */,
-				37AACAB71533CEF7008EB2FE /* smallNumbers-hd.png */,
-				37AACAB81533CEF7008EB2FE /* smallNumbers.fnt */,
-				37AACAB91533CEF7008EB2FE /* smallNumbers.png */,
-				37AACAA61533CEBC008EB2FE /* largeNumbers-hd.fnt */,
-				37AACAA71533CEBC008EB2FE /* largeNumbers-hd.png */,
-				37AACAA81533CEBC008EB2FE /* largeNumbers.fnt */,
-				37AACAA91533CEBC008EB2FE /* largeNumbers.png */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -716,6 +696,8 @@
 		37AACA7B1533B4E6008EB2FE /* Fight Bar */ = {
 			isa = PBXGroup;
 			children = (
+				37986E6F155A0F910061ACD2 /* pause_button-hd.png */,
+				37986E70155A0F910061ACD2 /* pause_button.png */,
 				37340CF7154E17A2009C22CA /* FightbarUI-hd.plist */,
 				37340CF8154E17A2009C22CA /* FightbarUI-hd.png */,
 				37340CF9154E17A2009C22CA /* FightbarUI.plist */,
@@ -821,8 +803,8 @@
 				3715ADEA152FABC60080EACD /* Default.png */,
 				3715ADEB152FABC60080EACD /* Default@2x.png */,
 				3715ADEC152FABC60080EACD /* fps_images.png */,
+				372B268D15520B80006E6BA0 /* icon@2x.png */,
 				37AACA801533BD38008EB2FE /* icon.png */,
-				3715ADED152FABC60080EACD /* icon@2x.png */,
 				3715ADEE152FABC60080EACD /* Info.plist */,
 				3715ADEF152FABC60080EACD /* iTunesArtwork */,
 			);
@@ -1262,17 +1244,8 @@
 				3715AE1C152FABC70080EACD /* Default.png in Resources */,
 				3715AE1D152FABC70080EACD /* Default@2x.png in Resources */,
 				3715AE1E152FABC70080EACD /* fps_images.png in Resources */,
-				3715AE1F152FABC70080EACD /* icon@2x.png in Resources */,
 				3715AE21152FABC70080EACD /* iTunesArtwork in Resources */,
 				37AACA811533BD38008EB2FE /* icon.png in Resources */,
-				37AACAAE1533CEBC008EB2FE /* largeNumbers-hd.fnt in Resources */,
-				37AACAAF1533CEBC008EB2FE /* largeNumbers-hd.png in Resources */,
-				37AACAB01533CEBC008EB2FE /* largeNumbers.fnt in Resources */,
-				37AACAB11533CEBC008EB2FE /* largeNumbers.png in Resources */,
-				37AACABA1533CEF7008EB2FE /* smallNumbers-hd.fnt in Resources */,
-				37AACABB1533CEF7008EB2FE /* smallNumbers-hd.png in Resources */,
-				37AACABC1533CEF7008EB2FE /* smallNumbers.fnt in Resources */,
-				37AACABD1533CEF7008EB2FE /* smallNumbers.png in Resources */,
 				37AACACC15349750008EB2FE /* Block_touch.caf in Resources */,
 				376404461537F21C0029EDD7 /* trace_line_angle-hd.png in Resources */,
 				376404471537F21C0029EDD7 /* trace_line_angle.png in Resources */,
@@ -1296,6 +1269,9 @@
 				37B698AD154E3ECB00534E21 /* Score-hd.png in Resources */,
 				37B698AE154E3ECB00534E21 /* Score.fnt in Resources */,
 				37B698AF154E3ECB00534E21 /* Score.png in Resources */,
+				372B268E15520B80006E6BA0 /* icon@2x.png in Resources */,
+				37986E71155A0F910061ACD2 /* pause_button-hd.png in Resources */,
+				37986E72155A0F910061ACD2 /* pause_button.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1488,14 +1464,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_BIT)",
+					armv6,
+				);
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NS_BLOCK_ASSERTIONS,
 					NDEBUG,
 				);
-				"GCC_THUMB_SUPPORT[arch=armv6]" = NO;
+				"GCC_THUMB_SUPPORT[arch=armv6]" = YES;
 				"GCC_THUMB_SUPPORT[arch=armv7]" = YES;
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -1544,9 +1523,9 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "cocos2d libraries";
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				ZERO_LINK = NO;
 			};
@@ -1556,14 +1535,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
+				COPY_PHASE_STRIP = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "cocos2d libraries";
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -1576,9 +1555,9 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "cocos2d libraries";
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 				ZERO_LINK = NO;
 			};
@@ -1588,7 +1567,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_BIT)",
+					armv6,
+				);
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1596,7 +1578,7 @@
 					"COCOS2D_DEBUG=1",
 					"CD_DEBUG=1",
 				);
-				"GCC_THUMB_SUPPORT[arch=armv6]" = NO;
+				"GCC_THUMB_SUPPORT[arch=armv6]" = YES;
 				"GCC_THUMB_SUPPORT[arch=armv7]" = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1612,14 +1594,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_BIT)",
+					armv6,
+				);
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NS_BLOCK_ASSERTIONS,
 					NDEBUG,
 				);
-				"GCC_THUMB_SUPPORT[arch=armv6]" = NO;
+				"GCC_THUMB_SUPPORT[arch=armv6]" = YES;
 				"GCC_THUMB_SUPPORT[arch=armv7]" = YES;
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;

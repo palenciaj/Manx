@@ -31,10 +31,10 @@
 	
 	colors = [[NSArray alloc] initWithObjects:
 			  @"nmy", 
-			  @"blu",
+			  @"red",
 			  @"prp", 
 			  @"grn", 
-			  @"red", nil];
+			  @"blu", nil];
 }
 
 /*
@@ -71,10 +71,10 @@
 
 -(NSString*) pickBlockColor:(bool)b
 {
-	#define NUM_OF_BLOCK_COLORS 4
+	#define NUM_OF_BLOCK_COLORS 3
     
     //make 10% change of getting mult. block
-    
+    /*
     if(b)
     {
         if(((arc4random() % 100)) < 5)
@@ -87,7 +87,7 @@
             return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
         }
     }
-    
+    */
     return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
 }
 
@@ -101,9 +101,48 @@
     return [Block blockWithParentNode:blockLayer withColor:c atPositionX:x atPositionY:y atGridPosition:g withSize:s];
 }
 
+-(BOOL)clusterStillExists:(Outline*)outline
+{
+    BOOL cluster = YES;
+    
+    for(int i = 0 ; i < [[outline getBlocks] count]; i++)
+    {
+        int gridPos1 = [[[outline getBlocks] objectAtIndex:i] getGridPosition];
+        int gridPos2 = [[[outline getBlockGridPos] objectAtIndex:i] intValue];
+        
+        if(gridPos1 != gridPos2)
+        {
+            cluster = NO;
+        }
+    }
+        
+    if(!cluster)                                 
+    {
+        for(Block* block in [outline getBlocks])
+        {
+            [block setClusterStatus:NO];
+        }
+    }
+
+    return cluster;
+}
+
 -(void)detectBlockClusters
 {
     int count = [blocks count];
+    
+    NSMutableArray* deadOutlines = [[NSMutableArray alloc] initWithCapacity:[outlines count]];
+    
+    for(Outline* outline in outlines)
+    {
+        if([outline getTouched] || ![self clusterStillExists:outline])
+        {
+            [outline remove];
+            [deadOutlines addObject:outline];
+        }
+    }
+    
+    [outlines removeObjectsInArray:deadOutlines];
     
     for(int i = 0; i < count; i++)
     {
@@ -121,7 +160,9 @@
            
            if((col < colCheck) && (row < rowCheck))
            {
-               NSString* color = [(Block*)[blocks objectAtIndex:i] getColor];
+               Block* block = (Block*)[blocks objectAtIndex:i];
+               
+               NSString* color = [block getColor];
                
                NSMutableArray* blocksToCheck = [[NSMutableArray alloc] init];
                
@@ -131,9 +172,9 @@
                
                BOOL cluster = YES;
                
-               for(Block* block in blocksToCheck)
+               for(Block* b in blocksToCheck)
                {
-                   if(![color isEqualToString:[block getColor]] || [block isPartOfCluster])
+                   if(![color isEqualToString:[b getColor]] || [b isPartOfCluster])
                    {
                        cluster = NO;
                    }
@@ -145,11 +186,13 @@
                    
                    CCLOG(@"2x2 Detected!! At %i, %i", col, row);
                    
+                   [blocksToCheck addObject:block];
+                   [block setClusterStatus:YES];
+                   
                    float x = offSet + (col + 1) * blockWidth;
                    float y = (row + 1) * blockWidth;
                    Outline* outline2x2 = [Outline outlineWithParentNode:self atPositionX:x atPositionY:y withSize:2];
-                   [outline2x2 setBLocks:blocksToCheck];
-                   
+                   [outline2x2 setBlocks:blocksToCheck];
                    
                    for(Block* block in blocksToCheck)
                    {
@@ -168,19 +211,19 @@
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	
-	
+	/*
     Block* myBlock = [self createNewBlockAtPositionX:x 
                                            positionY:y 
                                            withColor:[self pickBlockColor:b] 
                                       atGridPosition:[blocks count] 
                                             withSize:s];
-    /*
+    */
     Block* myBlock = [self createNewBlockAtPositionX:x 
                                            positionY:y 
                                            withColor:[colors objectAtIndex:[[test objectAtIndex:[blocks count]] intValue]] 
                                       atGridPosition:[blocks count] 
                                             withSize:s];
-	*/
+	
 	[blocks addObject:myBlock];
 }
 
@@ -194,7 +237,7 @@
 	blockLayer = [[CCLayer alloc] init];
 	[self addChild:blockLayer z:-1];
 	
-	float blockWidth = [[CCSprite spriteWithFile:[[colors objectAtIndex:1] stringByAppendingString:@"1_block0.png"]] boundingBox].size.width;
+	float blockWidth = [[CCSprite spriteWithSpriteFrameName:[[colors objectAtIndex:1] stringByAppendingString:@"1_tile1.png"]] boundingBox].size.width;
     
     CGSize winSize = [[CCDirector sharedDirector] winSize];
 	
@@ -226,7 +269,7 @@
 		y += blockWidth;
 	}
     
-    //[self detectBlockClusters];
+    [self detectBlockClusters];
 }
 
 -(void)drawTraceLine:(NSString*)type postionX:(float)x postionY:(float)y rotation:(int)r
@@ -343,110 +386,139 @@
     scoreLabel.visible = YES;
 }
 
+-(void)outlineTouched:(Outline*)outline
+{
+    touchedBlocks = [outline getBlocks];
+    [outline hide];
+    [outline setTouched:YES];
+    [self getRidOfTiles];
+}
+
 - (void)selectSpriteForTouch:(CGPoint)touchLocation 
 {
     //CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-	
-	//check if backtracking
-	if(([touchedBlocks count] > 1) && 
-	   CGRectContainsPoint([(Block*)[touchedBlocks objectAtIndex:[touchedBlocks count]-2] calcHitArea],touchLocation))
-	{
-        if([[(Block*)[touchedBlocks lastObject] getColor] isEqualToString:@"mul"])
+    
+    //check if touching outline (only if haven't touched any blocks yet)
+    bool outlineTouched = NO;
+    
+    if(blockCount == 0)
+    {
+        for(Outline* outline in outlines)
         {
-            multiplier -= 5;
-            [multiplierLabel setString:[NSString stringWithFormat:@"x%i", multiplier]];
-        }
-        else 
-        {
-            blockCount--;
-            if(blockCount == 0)
+            if(CGRectContainsPoint([outline calcHitArea], touchLocation))
             {
-                touchedColor = @"none";
+                CCLOG(@"outline touched");
+                outlineTouched = YES;
+                [self outlineTouched:outline];
             }
         }
-        
-        [(Block*)[touchedBlocks lastObject] swapToNormalBlock];
-        [self removeBlockFromColCount:(Block*)[touchedBlocks lastObject]];
-        [touchedBlocks removeLastObject];
-        
-        [(CCSprite*)[traceLine lastObject] removeFromParentAndCleanup:YES];
-        [traceLine removeLastObject];
-        
-        if(blockCount < 3)
-        {
-            scoreLabel.visible = NO;
-        }
-		
-		return;
-	}
+    }
 	
-	for (Block* block in blocks) 
-	{
-		if([block isKindOfClass:[Block class]] && ![[block getColor] isEqualToString:@"nmy"] && CGRectContainsPoint([block calcHitArea], touchLocation) && ![touchedBlocks containsObject:block])
+    if(!outlineTouched) 
+    {
+        //check if backtracking
+        if(([touchedBlocks count] > 1) && 
+           CGRectContainsPoint([(Block*)[touchedBlocks objectAtIndex:[touchedBlocks count]-2] calcHitArea],touchLocation))
         {
-            if([[block getColor] isEqualToString:@"mul"])
+            if([[(Block*)[touchedBlocks lastObject] getColor] isEqualToString:@"mul"])
             {
-                multiplier += 5;
+                multiplier -= 5;
                 [multiplierLabel setString:[NSString stringWithFormat:@"x%i", multiplier]];
-                
             }
-            
-            else if([touchedColor isEqualToString:@"none"])
+            else 
             {
-                touchedColor = [block getColor];
-                CCLOG(@"touched: %@", block);
+                blockCount--;
+                if(blockCount == 0)
+                {
+                    touchedColor = @"none";
+                }
             }
             
-            if ([touchedColor isEqualToString:[block getColor]] || [[block getColor] isEqualToString:@"mul"]) 
-            {            
-                if([touchedBlocks count] > 0)
+            [(Block*)[touchedBlocks lastObject] swapToNormalBlock];
+            [self removeBlockFromColCount:(Block*)[touchedBlocks lastObject]];
+            [touchedBlocks removeLastObject];
+            
+            [(CCSprite*)[traceLine lastObject] removeFromParentAndCleanup:YES];
+            [traceLine removeLastObject];
+            
+            if(blockCount < 3)
+            {
+                scoreLabel.visible = NO;
+            }
+            
+            return;
+        }
+        
+        for (Block* block in blocks) 
+        {
+            if([block isKindOfClass:[Block class]] && ![[block getColor] isEqualToString:@"nmy"] && CGRectContainsPoint([block calcHitArea], touchLocation) && ![touchedBlocks containsObject:block])
+            {
+                if([[block getColor] isEqualToString:@"mul"])
                 {
-                    if([self checkIfBlock:[touchedBlocks lastObject] touches:block] != doesNotTouch)
+                    multiplier += 5;
+                    [multiplierLabel setString:[NSString stringWithFormat:@"x%i", multiplier]];
+                    
+                }
+                
+                else if([touchedColor isEqualToString:@"none"])
+                {
+                    touchedColor = [block getColor];
+                    CCLOG(@"touched: %@", block);
+                }
+                
+                if ([touchedColor isEqualToString:[block getColor]] || [[block getColor] isEqualToString:@"mul"]) 
+                {            
+                    if([touchedBlocks count] > 0)
+                    {
+                        if([self checkIfBlock:[touchedBlocks lastObject] touches:block] != doesNotTouch)
+                        {
+                            if(![[block getColor] isEqualToString:@"mul"])
+                            {
+                                blockCount++;
+                                //CCLOG(@"Block count %i", blockCount);
+                            }
+                            
+                            [block swapToDeadBlock];
+                            [self playBlockTouch];
+                            [touchedBlocks addObject:block];
+                            [self addBlockToColCount:block];
+                            
+                        }
+                        else 
+                        {
+                            //CCLOG(@"Sprites Do Not Touch");
+                            break;
+                        }
+                    }
+                    
+                    else 
                     {
                         if(![[block getColor] isEqualToString:@"mul"])
                         {
-                           blockCount++;
-                            //CCLOG(@"Block count %i", blockCount);
+                            blockCount++;
+                            CCLOG(@"Block count %i", blockCount);
                         }
                         
                         [block swapToDeadBlock];
                         [self playBlockTouch];
                         [touchedBlocks addObject:block];
                         [self addBlockToColCount:block];
-                        
-                    }
-                    else 
-                    {
-                        //CCLOG(@"Sprites Do Not Touch");
-                        break;
-                    }
-                }
-                
-                else 
-                {
-                    if(![[block getColor] isEqualToString:@"mul"])
-                    {
-                        blockCount++;
-                        CCLOG(@"Block count %i", blockCount);
                     }
                     
-                    [block swapToDeadBlock];
-                    [self playBlockTouch];
-                    [touchedBlocks addObject:block];
-                    [self addBlockToColCount:block];
+                    break;
                 }
-                
-                break;
             }
         }
+        
     }
+	
 }
 
 -(void)makeBlocksFall
 {
     CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
     
-    int blockWidth = [[CCSprite spriteWithFile:[[colors objectAtIndex:1] stringByAppendingString:@"1_block0.png"]] boundingBox].size.width;
+    int blockWidth = [[CCSprite spriteWithSpriteFrameName:[[colors objectAtIndex:1] stringByAppendingString:@"1_tile1.png"]] boundingBox].size.width;
     
     // create array size of # of columns and full of 0s
     NSMutableArray* fallCountByColumn = [[NSMutableArray alloc] initWithCapacity:numOfGridCols];
@@ -578,14 +650,7 @@
     
     [self touchEndedCleanUp];
     
-    for(Outline* outline in outlines)
-    {
-        [outline remove];
-    }
-    
-    [outlines removeAllObjects];
-    
-    //[self detectBlockClusters];
+    [self detectBlockClusters];
 }
 
 
@@ -672,6 +737,24 @@
     CCLOG(@"Number of blocks:%i", [blocks count]);
 }
 
+-(void)getRidOfTiles
+{
+    NSMutableArray* hideActions = [[NSMutableArray alloc] init];
+    
+    for (Block* block in touchedBlocks) 
+    {
+        //[block hide];
+        [hideActions addObject:[CCCallFuncND actionWithTarget:self selector:@selector(hideBlock:data:) data:(Block*)block]];
+        //[hideActions addObject:[CCDelayTime actionWithDuration:.05]];
+    }
+    [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(makeBlocksFall)]];
+    //[hideActions addObject:[CCDelayTime actionWithDuration:.7]];
+    //[hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(removeSpikeTilesAtBottom)]];
+    
+    [self runAction: [CCSequence actions:[self getActionSequence: hideActions],nil]];
+
+}
+
 - (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {	
     scoreLabel.visible = NO;
@@ -691,20 +774,9 @@
         totalScore = totalScore + score;
         [totalScoreLabel setString:[NSString stringWithFormat:@"%i", totalScore]];
         
-        NSMutableArray* hideActions = [[NSMutableArray alloc] init];
+        [self getRidOfTiles];
         
-        for (Block* block in touchedBlocks) 
-		{
-            //[block hide];
-            [hideActions addObject:[CCCallFuncND actionWithTarget:self selector:@selector(hideBlock:data:) data:(Block*)block]];
-            //[hideActions addObject:[CCDelayTime actionWithDuration:.05]];
-		}
-        [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(makeBlocksFall)]];
-        [hideActions addObject:[CCDelayTime actionWithDuration:.3]];
-        [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(removeSpikeTilesAtBottom)]];
-        
-        [self runAction: [CCSequence actions:[self getActionSequence: hideActions],nil]];
-	}
+    }
 	
 	else 
 	{
@@ -720,8 +792,10 @@
 -(void)loadTestArray
 {
     test = [[NSArray alloc] initWithObjects:
-            [NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:3],[NSNumber numberWithInt:4],[NSNumber numberWithInt:5],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4],[NSNumber numberWithInt:4], nil];
-}
+            [NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3], nil];}
+
+
+
 
 -(void)scheduleUpdateMethod 
 {
@@ -792,6 +866,19 @@
 		fightBarBg.position = ccp(winSize.width/2, winSize.height - (fightBarBg.contentSize.height / 2));
 		[self addChild:fightBarBg z:2];
         
+        //CCSprite* pauseButton = [CCSprite spriteWithSpriteFrameName:@"pause_button.png"];
+        
+        CCMenuItem *pauseButton = [CCMenuItemImage
+								   itemFromNormalImage:@"pause_button.png" selectedImage:@"pause_button.png"
+								   target:self selector:@selector(pauseButtonTapped:)];
+		
+		pauseButton.position = ccp(winSize.width - pauseButton.contentSize.width/2, 
+								   winSize.height - pauseButton.contentSize.height/2);
+		
+		
+		CCMenu *button = [CCMenu menuWithItems:pauseButton, nil];
+		button.position = CGPointZero;
+		[self addChild:button z:3];
         
         /*
         energyBar = [CCSprite spriteWithFile:@"fight_bar_energy.png"];
@@ -814,7 +901,7 @@
         [self addChild:totalScoreLabel z:3];
 		//end fight bar
         
-        scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"smallNumbers.fnt"];
+        scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"Score.fnt"];
         scoreLabel.visible = NO;
         [self  addChild:scoreLabel z:10];
 		
@@ -846,15 +933,20 @@
 	totalScore = 0;
     [totalScoreLabel setString:[NSString stringWithFormat:@"%i", totalScore]];
 
-	
-    
     for (Block* block in blocks) 
 	{
 		if([block isKindOfClass:[Block class]] && !([[block getColor] isEqualToString:@"empty"]))
             [block remove];
 	}
 	
+    for(Outline* outline in outlines)
+    {
+        [outline remove];
+    }
+    
 	[blocks removeAllObjects];
+    [outlines removeAllObjects];
+    
 	
 	[self createAndDisplayGrid];
 }

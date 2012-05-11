@@ -20,16 +20,18 @@
 {
 	if ((self = [super init]))
 	{
-		CCLOG(@"%@: %@ Position: %f, %f GridPos: %i, Color: %@", NSStringFromSelector(_cmd), self, x, y, g, color);
+		//CCLOG(@"%@: %@ Position: %f, %f GridPos: %i, Color: %@", NSStringFromSelector(_cmd), self, x, y, g, color);
 		
 		myColor = [[NSString alloc] initWithString:color];
 		mySize = s;
         myGridPosition = g;
         isPartOfCluster = NO;
+        animateTag = 222;
         
         myActions = [[NSMutableArray alloc] init];
         
         spriteType = 1;
+        fall = 0;
         
         if([myColor isEqualToString:@"grn"])
         {
@@ -62,7 +64,7 @@
         }
         
         mySprite = [CCSprite spriteWithSpriteFrameName:[self normalTexture]];
-        [self animate];
+        //[self animate];
 
         //mySprite.anchorPoint = ccp(0,0);
 		mySprite.position = ccp(x,y);
@@ -97,6 +99,7 @@
     
     CCAnimate* animate = [CCAnimate actionWithAnimation:animation];
     CCRepeatForever* repeat = [CCRepeatForever actionWithAction:animate];
+    repeat.tag = animateTag;
     [mySprite runAction:repeat];
     
 }
@@ -124,6 +127,7 @@
 -(void)addAction:(CCAction*)action
 {
     [myActions addObject:action];
+    //fall ++;
 }
 
 -(CCFiniteTimeAction*) getActionSequence: (NSArray *) actions
@@ -151,13 +155,15 @@
         isPartOfCluster = NO;
     }
     
+    
+    
     [myActions removeAllObjects];
 }
 
 -(void)swapToDeadBlock
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
-    [mySprite stopAllActions];
+    [mySprite stopActionByTag:animateTag];
     [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[NSString stringWithFormat:@"tile_%@_touch.png", myColor]]];
     //[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_dead_tile.png"]]];
     
@@ -167,7 +173,16 @@
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
     
-	[self animate];
+    if(isPartOfCluster)
+    {
+        [self animate];
+    }
+    else 
+    {
+        [mySprite stopActionByTag:animateTag];
+        [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[self normalTexture]]];
+    }
+	
     //[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[self normalTexture]]];
 }
 
@@ -189,6 +204,17 @@
 -(void)setClusterStatus:(BOOL)c
 {
     isPartOfCluster = c;
+    
+    if(isPartOfCluster)
+    {
+        [self animate];
+    }
+    else 
+    {
+        [mySprite stopActionByTag:animateTag];
+        [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[self normalTexture]]];
+    }
+
 }
 
 -(void)setPosition:(CGPoint)position
