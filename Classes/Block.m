@@ -64,7 +64,7 @@
         }
         
         mySprite = [CCSprite spriteWithSpriteFrameName:[self normalTexture]];
-        //[self animate];
+        [self animate];
 
         //mySprite.anchorPoint = ccp(0,0);
 		mySprite.position = ccp(x,y);
@@ -162,7 +162,7 @@
 
 -(void)swapToDeadBlock
 {
-	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
+	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
     [mySprite stopActionByTag:animateTag];
     [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[NSString stringWithFormat:@"tile_%@_touch.png", myColor]]];
     //[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[myColor stringByAppendingString:@"_dead_tile.png"]]];
@@ -171,8 +171,11 @@
 
 -(void)swapToNormalBlock
 {
-	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
+	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
     
+    [self animate];
+    
+    /*
     if(isPartOfCluster)
     {
         [self animate];
@@ -182,7 +185,7 @@
         [mySprite stopActionByTag:animateTag];
         [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[self normalTexture]]];
     }
-	
+	*/
     //[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[self normalTexture]]];
 }
 
@@ -203,6 +206,8 @@
 
 -(void)setClusterStatus:(BOOL)c
 {
+    CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
+    
     isPartOfCluster = c;
     
     if(isPartOfCluster)
@@ -274,7 +279,7 @@
 
 -(NSString*) description
 {
-    return [NSString stringWithFormat:@"%@: %p, %@, %i, size:%i", [self class], self, myColor, myGridPosition, mySize];
+    return [NSString stringWithFormat:@"%@: %p, %@, %i, size:%i, %@", [self class], self, myColor, myGridPosition, mySize, isPartOfCluster ? @"YES" : @"NO"];
 }
 
 - (void)dealloc 

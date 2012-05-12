@@ -269,7 +269,7 @@
 		y += blockWidth;
 	}
     
-    [self detectBlockClusters];
+    //[self detectBlockClusters];
 }
 
 -(void)drawTraceLine:(NSString*)type postionX:(float)x postionY:(float)y rotation:(int)r
@@ -648,9 +648,8 @@
 
     [movedBlocks removeAllObjects];
     
-    [self touchEndedCleanUp];
-    
     [self detectBlockClusters];
+    [self touchEndedCleanUp];
 }
 
 
