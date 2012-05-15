@@ -32,6 +32,8 @@
     CCSprite* energyBar;
     float energyBarMovement;
     
+    BOOL touchHappening;
+    
     CCLabelBMFont* totalScoreLabel;
     CCLabelBMFont* multiplierLabel;
     CCLabelBMFont* scoreLabel;

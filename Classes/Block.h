@@ -64,6 +64,7 @@
 -(void)setGridPosition:(int)g;
 
 -(void)hide;
+-(BOOL)hidden;
 
 -(void)remove;
 

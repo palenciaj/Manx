@@ -64,7 +64,7 @@
         }
         
         mySprite = [CCSprite spriteWithSpriteFrameName:[self normalTexture]];
-        [self animate];
+        //[self animate];
 
         //mySprite.anchorPoint = ccp(0,0);
 		mySprite.position = ccp(x,y);
@@ -173,9 +173,9 @@
 {
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
     
-    [self animate];
+    //[self animate];
     
-    /*
+    
     if(isPartOfCluster)
     {
         [self animate];
@@ -185,7 +185,7 @@
         [mySprite stopActionByTag:animateTag];
         [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[self normalTexture]]];
     }
-	*/
+	
     //[mySprite setTexture:[[CCTextureCache sharedTextureCache] addImage:[self normalTexture]]];
 }
 
@@ -210,6 +210,7 @@
     
     isPartOfCluster = c;
     
+    /*
     if(isPartOfCluster)
     {
         [self animate];
@@ -219,6 +220,7 @@
         [mySprite stopActionByTag:animateTag];
         [mySprite setDisplayFrame:[[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:[self normalTexture]]];
     }
+     */
 
 }
 
@@ -268,6 +270,11 @@
 -(void)hide
 {
     mySprite.visible = NO;
+}
+
+-(BOOL)hidden
+{
+    return !mySprite.visible;
 }
 
 -(void)remove

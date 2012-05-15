@@ -74,7 +74,7 @@
 	#define NUM_OF_BLOCK_COLORS 3
     
     //make 10% change of getting mult. block
-    /*
+    
     if(b)
     {
         if(((arc4random() % 100)) < 5)
@@ -87,7 +87,7 @@
             return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
         }
     }
-    */
+    
     return [colors objectAtIndex:((arc4random() % NUM_OF_BLOCK_COLORS) + 1)];
 }
 
@@ -103,16 +103,26 @@
 
 -(BOOL)clusterStillExists:(Outline*)outline
 {
+    CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
+    
     BOOL cluster = YES;
     
     for(int i = 0 ; i < [[outline getBlocks] count]; i++)
     {
-        int gridPos1 = [[[outline getBlocks] objectAtIndex:i] getGridPosition];
-        int gridPos2 = [[[outline getBlockGridPos] objectAtIndex:i] intValue];
-        
-        if(gridPos1 != gridPos2)
+        if([[[outline getBlocks] objectAtIndex:i] hidden])
         {
             cluster = NO;
+        }
+        
+        else 
+        {
+            int gridPos1 = [[[outline getBlocks] objectAtIndex:i] getGridPosition];
+            int gridPos2 = [[[outline getBlockGridPos] objectAtIndex:i] intValue];
+            
+            if(gridPos1 != gridPos2)
+            {
+                cluster = NO;
+            }
         }
     }
         
@@ -129,6 +139,8 @@
 
 -(void)detectBlockClusters
 {
+    CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
+    
     int count = [blocks count];
     
     NSMutableArray* deadOutlines = [[NSMutableArray alloc] initWithCapacity:[outlines count]];
@@ -146,7 +158,7 @@
     
     for(int i = 0; i < count; i++)
     {
-       if([[blocks objectAtIndex:i] isKindOfClass:[Block class]] && ![[blocks objectAtIndex:i] isPartOfCluster])
+       if([[blocks objectAtIndex:i] isKindOfClass:[Block class]] && ![[blocks objectAtIndex:i] isPartOfCluster] && ![[[blocks objectAtIndex:i] getColor] isEqualToString:@"nmy"])
        {        
            // i % num of grid cols will give you COLUMN  it is in
            // i / num of grid cols will give you the ROW it is in
@@ -211,19 +223,19 @@
 {
 	//CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	
-	/*
+	
     Block* myBlock = [self createNewBlockAtPositionX:x 
                                            positionY:y 
                                            withColor:[self pickBlockColor:b] 
                                       atGridPosition:[blocks count] 
                                             withSize:s];
-    */
+    /*
     Block* myBlock = [self createNewBlockAtPositionX:x 
                                            positionY:y 
                                            withColor:[colors objectAtIndex:[[test objectAtIndex:[blocks count]] intValue]] 
                                       atGridPosition:[blocks count] 
                                             withSize:s];
-	
+	*/
 	[blocks addObject:myBlock];
 }
 
@@ -382,12 +394,13 @@
     
     [scoreLabel setString:[NSString stringWithFormat:@"+%i", score]];
     
-    scoreLabel.position = ccp(touchLocation.x, touchLocation.y + 40);
+    scoreLabel.position = ccp(touchLocation.x, touchLocation.y + 50);
     scoreLabel.visible = YES;
 }
 
 -(void)outlineTouched:(Outline*)outline
 {
+    CCLOG(@"%@: %@. %@", NSStringFromSelector(_cmd), self, [outline getBlocks]);
     touchedBlocks = [outline getBlocks];
     [outline hide];
     [outline setTouched:YES];
@@ -399,7 +412,8 @@
     //CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
     
     //check if touching outline (only if haven't touched any blocks yet)
-    bool outlineTouched = NO;
+    BOOL outlineTouched = NO;
+    
     
     if(blockCount == 0)
     {
@@ -417,8 +431,7 @@
     if(!outlineTouched) 
     {
         //check if backtracking
-        if(([touchedBlocks count] > 1) && 
-           CGRectContainsPoint([(Block*)[touchedBlocks objectAtIndex:[touchedBlocks count]-2] calcHitArea],touchLocation))
+        if(([touchedBlocks count] > 1) && CGRectContainsPoint([(Block*)[touchedBlocks objectAtIndex:[touchedBlocks count]-2] calcHitArea],touchLocation))
         {
             if([[(Block*)[touchedBlocks lastObject] getColor] isEqualToString:@"mul"])
             {
@@ -648,7 +661,6 @@
 
     [movedBlocks removeAllObjects];
     
-    [self detectBlockClusters];
     [self touchEndedCleanUp];
 }
 
@@ -694,18 +706,29 @@
 
 -(void)removeSpikeTilesAtBottom
 {
-    for(int i = 0; i < numOfGridCols; i++)
-    {
-        if([[(Block*)[blocks objectAtIndex:i] getColor] isEqualToString:@"nmy"])
-        {
-            [[blocks objectAtIndex:i] hide];
-            [touchedBlocks addObject:[blocks objectAtIndex:i]];
-        }
-    }
+    BOOL spikes = YES;
     
-    if([touchedBlocks count] > 0)
+    while(spikes)
     {
-        [self makeBlocksFall];
+        for(int i = 0; i < numOfGridCols; i++)
+        {
+            if([[(Block*)[blocks objectAtIndex:i] getColor] isEqualToString:@"nmy"])
+            {
+                [[blocks objectAtIndex:i] hide];
+                [touchedBlocks addObject:[blocks objectAtIndex:i]];
+            }
+            
+            else 
+            {
+                spikes = NO;
+            }
+        }
+        
+        if([touchedBlocks count] > 0)
+        {
+            [self getRidOfTiles];
+        }
+
     }
 }
 
@@ -717,6 +740,8 @@
 
 -(void)touchEndedCleanUp
 {
+    //[self detectBlockClusters];
+    
     [touchedBlocks removeAllObjects];
     
     [touchedBlockColumns removeAllObjects];
@@ -747,8 +772,8 @@
         //[hideActions addObject:[CCDelayTime actionWithDuration:.05]];
     }
     [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(makeBlocksFall)]];
-    //[hideActions addObject:[CCDelayTime actionWithDuration:.7]];
-    //[hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(removeSpikeTilesAtBottom)]];
+    [hideActions addObject:[CCDelayTime actionWithDuration:.7]];
+    [hideActions addObject:[CCCallFuncN actionWithTarget:self selector:@selector(removeSpikeTilesAtBottom)]];
     
     [self runAction: [CCSequence actions:[self getActionSequence: hideActions],nil]];
 
@@ -791,7 +816,8 @@
 -(void)loadTestArray
 {
     test = [[NSArray alloc] initWithObjects:
-            [NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3], nil];}
+            [NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:0],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3], nil];}
+
 
 
 
@@ -824,7 +850,7 @@
 	{
 		CGSize winSize = [[CCDirector sharedDirector] winSize];
 		
-		numOfGridRows = 9;
+		numOfGridRows = 8;
 		numOfGridCols = 7;
         
         CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache]; 
@@ -836,14 +862,17 @@
 		
 		[self addChild:blockLayer z:-1];
 		
-        
+        /*
 		[CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_RGB565];
         CCSprite *background = [CCSprite spriteWithFile:@"background.png"];
         background.anchorPoint = ccp(0,0);
         [self addChild:background z:-4];
         [CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_Default];
 		CCLOG(@"background loaded");
-         
+        */
+        
+        CCLayerColor* colorLayer = [CCLayerColor layerWithColor:ccc4(255, 255, 255, 255)];
+        [self addChild:colorLayer z:-100];
         
 		[self loadTestArray];
 		
@@ -900,7 +929,7 @@
         [self addChild:totalScoreLabel z:3];
 		//end fight bar
         
-        scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"Score.fnt"];
+        scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"TraceScore.fnt"];
         scoreLabel.visible = NO;
         [self  addChild:scoreLabel z:10];
 		
