@@ -15,7 +15,7 @@
 
 @implementation GameScene
 
-@synthesize blockCount, numOfGridRows, numOfGridCols, offSet;
+@synthesize blockCount, numOfGridRows, numOfGridCols, offSetX, offSetY;
 
 +(id) scene
 {
@@ -201,8 +201,8 @@
                    [blocksToCheck addObject:block];
                    [block setClusterStatus:YES];
                    
-                   float x = offSet + (col + 1) * blockWidth;
-                   float y = (row + 1) * blockWidth;
+                   float x = offSetX + (col + 1) * blockWidth;
+                   float y = offSetY + (row + 1) * blockWidth;
                    Outline* outline2x2 = [Outline outlineWithParentNode:self atPositionX:x atPositionY:y withSize:2];
                    [outline2x2 setBlocks:blocksToCheck];
                    
@@ -253,14 +253,15 @@
     
     CGSize winSize = [[CCDirector sharedDirector] winSize];
 	
-	offSet = (winSize.width - blockWidth * numOfGridCols) / 2;
+	offSetX = (winSize.width - blockWidth * numOfGridCols) / 2;
+    offSetY = 30;
 	
-	float x = offSet + blockWidth/2;
-	float y = blockWidth/2;
+	float x = offSetX + blockWidth/2;
+	float y = offSetY + blockWidth/2;
 	
 	for(int i = 0; i < numOfGridRows; i++)
 	{
-		x = offSet + blockWidth/2;
+		x = offSetX + blockWidth/2;
 		
 		for(int j = 0; j < numOfGridCols; j++)
 		{
@@ -384,7 +385,7 @@
 {
     if(multiplier == 0)
     {
-        score = blockCount * 10;
+        score = blockCount * 5;
     }
     
     else 
@@ -392,7 +393,7 @@
         score = blockCount * 10 * multiplier;
     }
     
-    [scoreLabel setString:[NSString stringWithFormat:@"+%i", score]];
+    [scoreLabel setString:[NSString stringWithFormat:@"+%.0f", score]];
     
     scoreLabel.position = ccp(touchLocation.x, touchLocation.y + 50);
     scoreLabel.visible = YES;
@@ -629,8 +630,8 @@
         for(int j = 0; j < [[fallCountByColumnTotal objectAtIndex:i] intValue]; j++)
         {
             //calculate needed values, gp is the block's final position
-            float x = offSet + (i * blockWidth) + blockWidth/2;
-            float y = (numOfGridRows + j) * blockWidth + blockWidth/2;
+            float x = offSetX + (i * blockWidth) + blockWidth/2;
+            float y = offSetY + (numOfGridRows + j) * blockWidth + blockWidth/2;
             int gp = (((numOfGridRows + j) * numOfGridCols) + i) - (numOfGridCols * [[fallCountByColumnTotal objectAtIndex:i] intValue]);
             
             
@@ -797,7 +798,7 @@
 	{
         totalScore = totalScore + score;
         [totalScoreLabel setString:[NSString stringWithFormat:@"%i", totalScore]];
-        
+        [self heroAttack];
         [self getRidOfTiles];
         
     }
@@ -813,66 +814,189 @@
 	}
 }
 
+-(void)heroAttack
+{
+    myEnergy += score;
+    
+    float energyMovement = score / energyTotal * barWidth;
+    
+    energyBar.position = ccp(energyBar.position.x + energyMovement, energyBar.position.y);
+    
+    if(myEnergy >= energyTotal)
+    {
+        [self gameEnded:YES];
+    }
+    
+}
+
 -(void)loadTestArray
 {
     test = [[NSArray alloc] initWithObjects:
-            [NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:0],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3], nil];}
+            [NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:1],[NSNumber numberWithInt:1],[NSNumber numberWithInt:2],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:1],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:0],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:2],[NSNumber numberWithInt:0],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3],[NSNumber numberWithInt:3], nil];
+}
 
-
-
-
+-(void)gameEnded:(BOOL)win
+{
+    [self unscheduleAllSelectors];
+    
+    NSString* s;
+    
+    if(win)
+    {
+        s = @"won";
+    }
+    
+    else 
+    {
+        s = @"lost";
+    }
+    
+    CGSize winSize = [[CCDirector sharedDirector] winSize];
+    
+    NSString* image = [[@"you" stringByAppendingString:s] stringByAppendingString:@".png"];
+    
+    CCMenuItem* restart = [CCMenuItemImage itemFromNormalImage:image selectedImage:image target:self selector:@selector(restart:)];
+    
+    restart.position = ccp(winSize.width/2, winSize.height/2);
+    
+    CCMenu* menu = [CCMenu menuWithItems:restart, nil];
+    menu.position = CGPointZero;
+    [self addChild:menu z:10 tag:1];
+}
 
 -(void)scheduleUpdateMethod 
 {
-    [self schedule:@selector(updateLessThanOuncePerFrame:) interval:0.1f]; 
+    [self schedule:@selector(bossAttack:) interval:bossAttackFreq]; 
 }
 
--(void)updateLessThanOuncePerFrame:(ccTime)delta 
+-(void)bossHit:(float)attack
 {
-    energyBarMovement += .5;
+    myEnergy -= attack;
     
-    if(energyBar)
+    float energyMovement = attack / energyTotal * barWidth;
+    
+    energyBar.position = ccp(energyBar.position.x - energyMovement, energyBar.position.y);
+}
+
+-(void)bossAttack:(ccTime)delta 
+{
+    if(attackCount == bossSuperAttackFreq)
     {
-        energyBar.position = ccp(energyBar.position.x + .5, energyBar.position.y);
+        [self bossHit:bossSuperAttack];
+        attackCount = 0;
     }
     
-    if(energyBarMovement == energyBar.contentSize.width/4)
+    else 
     {
-        energyBar.position = ccp(fightBarBg.position.x, fightBarBg.position.y - energyBar.contentSize.height/2 + 5);
-        energyBarMovement = 0;
+        [self bossHit:bossAttack];
+         attackCount++;
     }
+    
+    if(myEnergy < 0)
+    {
+        [self gameEnded:NO];
+    }
+}
+
+-(void)initBossAttack
+{
+    barWidth = 145;
+    
+    
+    bossAttack = 10;
+    bossAttackFreq = 3;
+    bossSuperAttack = 20;
+    bossSuperAttackFreq = 3;
+    attackCount = 0;
+}
+
+-(void)initEnergyBar
+{
+    CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache]; 
+    
+    [frameCache addSpriteFramesWithFile:@"UI_Forest.plist"];
+
+    
+    CGSize winSize = [[CCDirector sharedDirector] winSize];
+    
+    energyTotal = 1000;
+    myEnergy = 500;
+    
+    
+    CCSprite* energyBarBG;
+    energyBarBG = [CCSprite spriteWithSpriteFrameName:@"playscreen_bar_greyBG.png"];
+    energyBarBG.position = ccp(winSize.width/2, winSize.height - (energyBarBG.contentSize.height / 2));
+    [self addChild:energyBarBG z:1];
+    
+    CCSprite* topBar;
+    topBar = [CCSprite spriteWithSpriteFrameName:@"playscreen_topbarBG_forest.png"];
+    topBar.position = ccp(winSize.width/2, winSize.height - (energyBarBG.contentSize.height / 2));
+    [self addChild:topBar z:3];
+    
+    CCSprite* bottomBar;
+    bottomBar = [CCSprite spriteWithSpriteFrameName:@"playscreen_btm_forest.png"];
+    bottomBar.position = ccp(winSize.width/2, (bottomBar.contentSize.height / 2));
+    [self addChild:bottomBar z:-3];
+    
+    energyBar = [CCSprite spriteWithSpriteFrameName:@"playscreen_bar_HP.png"];
+    energyBar.position = ccp(winSize.width/2 - energyBar.contentSize.width/2, winSize.height - (energyBar.contentSize.height / 2));
+    [self addChild: energyBar z:2];
+    
+    pauseButton = [CCSprite spriteWithSpriteFrameName:@"pause_button.png"];
+    pauseButton.position = ccp(winSize.width - pauseButton.contentSize.width/2, 
+                               winSize.height - pauseButton.contentSize.height/2);
+    
+    
+    /*
+     energyBar = [CCSprite spriteWithFile:@"fight_bar_energy.png"];
+     energyBar.position = ccp(fightBarBg.position.x, fightBarBg.position.y - energyBar.contentSize.height/2 + 5);
+     [self addChild:energyBar z:1];
+     
+     energyBarMovement = 0;
+     
+     CCSprite* multiIndicator = [CCSprite spriteWithFile:@"multi_indicator.png"];
+     multiIndicator.position = fightBarBg.position;
+     [self addChild:multiIndicator z:3];
+     
+     multiplierLabel = [CCLabelBMFont labelWithString:@"x" fntFile:@"smallNumbers.fnt"];
+     multiplierLabel.position = ccp(multiIndicator.position.x, multiIndicator.position.y - multiplierLabel.contentSize.height/4);
+     [self addChild:multiplierLabel z:4];
+     
+    
+    totalScoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"Score.fnt"];
+    totalScoreLabel.position = ccp(winSize.width/2, energyBarBG.position.y + totalScoreLabel.contentSize.height/2);
+    [self addChild:totalScoreLabel z:3];
+     */
 }
 
 -(id)init
 {
 	CCLOG(@"%@: %@", NSStringFromSelector(_cmd), self);
 	if((self = [super init]))
-	{
-		CGSize winSize = [[CCDirector sharedDirector] winSize];
-		
+	{		
 		numOfGridRows = 8;
 		numOfGridCols = 7;
         
-        CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache]; 
-        
-        [frameCache addSpriteFramesWithFile:@"FightbarUI.plist"];
-		
 		//init layers
 		blockLayer = [[CCLayer alloc] init];
 		
 		[self addChild:blockLayer z:-1];
 		
-        /*
+        
 		[CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_RGB565];
-        CCSprite *background = [CCSprite spriteWithFile:@"background.png"];
+        CCSprite *background = [CCSprite spriteWithFile:@"playscreen_bg_forest.png"];
         background.anchorPoint = ccp(0,0);
-        [self addChild:background z:-4];
+        [self addChild:background z:-10];
         [CCTexture2D setDefaultAlphaPixelFormat:kCCTexture2DPixelFormat_Default];
 		CCLOG(@"background loaded");
-        */
         
+        [self initBossAttack];
+        [self initEnergyBar];
+        
+        /*
         CCLayerColor* colorLayer = [CCLayerColor layerWithColor:ccc4(255, 255, 255, 255)];
         [self addChild:colorLayer z:-100];
+         */
         
 		[self loadTestArray];
 		
@@ -882,52 +1006,6 @@
 		totalScore = 0;
         score = 0;
         multiplier = 0;
-		
-		//fight bar
-        
-        CCSprite* gradiant = [CCSprite spriteWithSpriteFrameName:@"top_gradiant.png"];
-        gradiant.position = ccp(winSize.width/2, winSize.height - (gradiant.contentSize.height / 2));
-        [self addChild:gradiant z:1];
-        
-        
-        fightBarBg = [CCSprite spriteWithSpriteFrameName:@"fight_bar.png"];
-		fightBarBg.position = ccp(winSize.width/2, winSize.height - (fightBarBg.contentSize.height / 2));
-		[self addChild:fightBarBg z:2];
-        
-        //CCSprite* pauseButton = [CCSprite spriteWithSpriteFrameName:@"pause_button.png"];
-        
-        CCMenuItem *pauseButton = [CCMenuItemImage
-								   itemFromNormalImage:@"pause_button.png" selectedImage:@"pause_button.png"
-								   target:self selector:@selector(pauseButtonTapped:)];
-		
-		pauseButton.position = ccp(winSize.width - pauseButton.contentSize.width/2, 
-								   winSize.height - pauseButton.contentSize.height/2);
-		
-		
-		CCMenu *button = [CCMenu menuWithItems:pauseButton, nil];
-		button.position = CGPointZero;
-		[self addChild:button z:3];
-        
-        /*
-        energyBar = [CCSprite spriteWithFile:@"fight_bar_energy.png"];
-        energyBar.position = ccp(fightBarBg.position.x, fightBarBg.position.y - energyBar.contentSize.height/2 + 5);
-        [self addChild:energyBar z:1];
-        
-        energyBarMovement = 0;
-		
-        CCSprite* multiIndicator = [CCSprite spriteWithFile:@"multi_indicator.png"];
-        multiIndicator.position = fightBarBg.position;
-        [self addChild:multiIndicator z:3];
-        
-        multiplierLabel = [CCLabelBMFont labelWithString:@"x" fntFile:@"smallNumbers.fnt"];
-        multiplierLabel.position = ccp(multiIndicator.position.x, multiIndicator.position.y - multiplierLabel.contentSize.height/4);
-        [self addChild:multiplierLabel z:4];
-        */
-        
-		totalScoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"Score.fnt"];
-        totalScoreLabel.position = ccp(winSize.width/2, fightBarBg.position.y + totalScoreLabel.contentSize.height/2);
-        [self addChild:totalScoreLabel z:3];
-		//end fight bar
         
         scoreLabel = [CCLabelBMFont labelWithString:@"0" fntFile:@"TraceScore.fnt"];
         scoreLabel.visible = NO;
@@ -949,16 +1027,18 @@
         
         [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];
 		
+        CCSpriteFrameCache* frameCache = [CCSpriteFrameCache sharedSpriteFrameCache]; 
         [frameCache addSpriteFramesWithFile:@"Tiles.plist"];
 		[self createAndDisplayGrid];
-        //[self scheduleUpdateMethod];
+        [self scheduleUpdateMethod];
 	}
 	return self;
 }
 
-- (void)pauseButtonTapped:(id)sender 
+- (void)restart:(id)sender 
 {
 	totalScore = 0;
+    myEnergy = 500;
     [totalScoreLabel setString:[NSString stringWithFormat:@"%i", totalScore]];
 
     for (Block* block in blocks) 
@@ -975,8 +1055,14 @@
 	[blocks removeAllObjects];
     [outlines removeAllObjects];
     
+    CGSize winSize = [[CCDirector sharedDirector] winSize];
+    
+    energyBar.position = ccp(winSize.width/2 - energyBar.contentSize.width/2, winSize.height - (energyBar.contentSize.height / 2));
+
+    [self removeChildByTag:1 cleanup:YES];
 	
 	[self createAndDisplayGrid];
+    [self scheduleUpdateMethod];
 }
 
 

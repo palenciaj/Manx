@@ -25,10 +25,21 @@
     NSMutableArray* outlines;
     
     int totalScore;
-    int score;
+    float score;
     int multiplier;
     
-    CCSprite* fightBarBg;
+    int energyTotal;
+    int myEnergy;
+    
+    int barWidth; //size of window should be calculated off png
+    
+    float bossAttack;
+    float bossAttackFreq;
+    float bossSuperAttack;
+    float bossSuperAttackFreq;
+    float attackCount;
+    
+    CCSprite* pauseButton;
     CCSprite* energyBar;
     float energyBarMovement;
     
@@ -57,7 +68,7 @@
 @property int numOfGridRows;
 @property int numOfGridCols;
 @property int blockCount;
-@property float offSet;
+@property float offSetX,offSetY;
 
 +(id) scene;
 
